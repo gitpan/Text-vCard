@@ -1,26 +1,13 @@
-TODO:
+Addressbook:
 
-More tests all round!
+find()
+	- get vcards matching specific criteria
 
-Adding addresses, emails and other elements belonging to a list
+vCard:
 
-  $card->address_new(
-    'street' => "74 Bayswater",
-    'city' => "Ottawa",
-    'type' => [ 'home', 'work' ],
-  );
-- or -
-  my $new_address = $card->address_new;
-  $new_address->street( "74 Bayswater" );
-  $new_address->city("ottawa");
-  ....
+	- make nice interface for fn() and other single element/value
+	  nodes.
 
-
-my $agents = $vcard->agent();
-
-API for Text::vCard::Part::Binary
-
-Work with Jay on: 
-
-- write out vcards
-- parse version 2.1 of vCard format
+overall:
+	- better doc examples
+	- see about parsing version 3 vcf files

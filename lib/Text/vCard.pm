@@ -2,321 +2,222 @@ package Text::vCard;
 
 use Carp;
 use strict;
-
-use Text::vCard::Part::Name;
-use Text::vCard::Part::Address;
-use Text::vCard::Part::Basic;
-use Text::vCard::Part::Binary;
-use Text::vCard::Part::Geo;
+use Data::Dumper;
+use File::Slurp;
+use Text::vFile::asData;
+use Text::vCard::Node;
 
 # See this module for your basic parser functions
-use base qw(Text::vFile::Base);
-use vars qw ( $AUTOLOAD $VERSION );
-$VERSION = '1.0';
+use base qw(Text::vFile::asData);
+use vars qw ( $AUTOLOAD $VERSION %lookup %node_aliases);
+$VERSION = '1.1';
 
-# Tell vFile that BEGIN:VCARD line creates one of these objects
-$Text::vFile::classMap{'VCARD'}=__PACKAGE__;
+%lookup = (
+	'ADR' => ['po_box','extended','street','city','region','post_code','country'],
+	'N' => ['family','given','middle','prefixes','suffixes'],
+	'GEO' => ['lat','long'],
+	'ORG' => ['name','unit'],
+);
+
+%node_aliases = (
+	'FULLNAME' 	=> 'FN',
+	'BIRTHDAY'	=> 'BDAY',
+	'TIMEZONE'	=> 'TZ',
+	'PHONES'	=> 'TELS',
+	'ADDRESSES'	=> 'ADR',
+	'NAME'		=> 'N',
+);
+
+my @default_field = qw(value);
 
 =head1 NAME
 
-Text::vCard - a package to parse, edit and create vCards (RFC 2426) 
+Text::vCard - a package to edit and create a single vCard (RFC 2426) 
+
+=head1 WARNING
+
+You probably want to start with Text::vCard::Addressbook, then this module.
+
+This is not backwards compatable with 1.0 or earlier versions! 
+
+Version 1.1 is a complete rewrite/restructure, this should not happen again.
 
 =head1 SYNOPSIS
 
   use Text::vCard;
-  my $cards = Text::vCard->load( "foo.vCard", "blort.vCard", "whee.vCard" );
-
-  foreach my $vcard (@{$cards}) {
-	print "Got card for " . $vcard->fn() . "\n";
-  }
+  my $cards = Text::vCard->new({
+	'asData_node' => $objects_node_from_asData,
+  });
 
 =head1 DESCRIPTION
 
-This package provides an API to reading / editing and creating
-vCards. A vCard is an electronic business card. This package has
-been developed based on rfc2426 which is version 3, we are working
-to activly support version 2.1 as well (it works for most stuff other
-than 'type' on elements such as tel and address).
+A vCard is an electronic business card. 
 
-You will find that many applications (Apple Address book, MS Outlook,
-Evolution etc) can export and import vCards. 
+This package is for a single vCard (person / record / set of address information).
+It provides an API to editing and creating vCards, or supplied a specific piece
+of the Text::vFile::asData results it generates a vCard with that content.
 
-=head1 TODO
+=head1 METHODS
 
-- Write out vCards (will be part of Text::vFile).
-- Support 'types' on version 2.1 of vCards.
-- methods for creating elements.
-
-=head1 READING IN VCARDS
+=head2 new()
 
   use Text::vCard;
-  my $cards = Text::vCard->load( "foo.vCard", "blort.vCard");
 
-  foreach my $vcard (@{$cards}) {
-	$vcard->...;
-  }
-
-# OR
-
-  my $reader = Text::vCard->new( source_file => "foo.vCard" );
-  while ( my $vcard = $reader->next ) {
-	$vcard->...;
-  }
-
-# OR
-
-  my $reader = Text::vCard->new( source_text => $vcard_data );
-  while ( my $vcard = <$reader> ) {
-	$vcard->...;
-  }
-
-=head1 GENERAL METHODS
-
-=head2 split_value()
-
-  my @list = $vcard->split_value($value);
-  my $list_ref = $vcard->split_value($value);
+  my $new_vcard = Text::vCard->new();
   
-This method splits a value on non-escaped commas;
-into an array, or array ref (depending on calling context)
-it is useful as some methods (e.g. org and nickname) 
-will return the string non-seperated.
-
-=head2 name()
-
-  my $name = $vcard->name();
+  my $existing_vcard = Text::vCard->new({
+	'asData_node' => $objects_node_from_asData,
+  });
   
-This method returns the Text::vCard::Part::Name object
-if available, it returns undef if not.
+=cut
+
+sub new {
+	my ($proto,$conf) = @_;
+	my $class = ref($proto) || $proto;
+	my $self = {};
+
+	bless($self,$class);
+
+	if(defined $conf->{'asData_node'}) {
+		# Have a vcard data node being passed in
+		while(my ($node_type,$data) = each %{$conf->{'asData_node'}}) {
+			# Deal with each type (ADR, FN, TEL etc)
+			$self->_add_node({
+				'node_type' => $node_type,
+				'data' => $data,
+			});
+		}
+	} # else we're creating a new vCard
+
+	return $self;
+}
+
+
+=head2 add_node()
+
+my $address = $vcard->add_node({
+	'node_type' => 'ADR',
+});
+
+This creates a new address in the vcard which you can then call the
+address methods on, see below for what options are available.
+
+A node_type must be supplied, in the vCard Spec format (e.g. ADR not address)
 
 =cut
 
-sub name {
-	my $self = shift;
-	if(defined $self->{N}) {
-		return $self->{N};	
+sub add_node {
+	my ($self,$conf) = @_;
+	croak 'Must supply a node_type' unless defined $conf && defined $conf->{'node_type'};
+	unless(defined $conf->{data}) {
+		my %empty;
+		my @data = (\%empty);
+		$conf->{'data'} = \@data;
 	}
-	return undef;
+
+	$self->_add_node($conf);
 }
+  
+=head2 get()
 
-=head1 LIST METHODS
+This method allows you to get content out of a vcard.
 
-Accessing lists of elements, if no elements
-exist then undef is returned.
+  # get all elements
+  $nodes = $vcard->get('tels');
 
-  my @list = $vcard->method();
-  my $list_array_ref = $vcard->method();
-
-Return all of a specific element.
-
-  my @list_of_type = $vcard->method('type');
-  my @types = qw(home work pref);
-  my @list_of_type = $vcard->method(\@types);
+  # Just get the home address
+  my $nodes = $vcard->get({
+	'element_type' => 'addresses',
+	'types' => 'home',
+  });
+  
+  # get all phone number that matches serveral types
+  my @types = qw(work home);
+  my $nodes = $vcard->get({
+	'element_type' => 'tels',
+	'types' => \@types,
+  });
+ 
+Either an array or array ref is returned, containing Text::vCard::Node objects.
+If there are no results of 'element_type' undef is returned.
 
 Supplied with a scalar or an array ref the methods
-return a list of specific elements of a type. If any
+return a list of nodes of a type, where relevant. If any
 of the elements is the prefered element it will be
 returned as the first element of the list.
+
+=cut
+
+sub get {
+	my ($self,$conf) = @_;
+	carp "You did not supply an element type" unless defined $conf;
+	if(ref($conf) eq 'HASH') {
+		return $self->get_of_type($conf->{'element_type'},$conf->{'types'}) if defined $conf->{'types'};
+		return $self->get_of_type($conf->{'element_type'});
+	} else {
+		return $self->get_of_type($conf);
+	}
+}
+
+
+=head2 simple nodes
+
+########## CHECK
+  my $fullname = ($vcard->get({ 'element_type' => 'fullname' }))[0];
   
-  foreach my $object (@list) {
-  	$object->value();
-  	$object->value($new_value);
-  	$object->is_type('fax');
-  	$object->add_type('home');
-  	$object->remove_type('work');
+  # get the value
+  print $fullname->value();
+
+  # set the value
+  $fullname->value('Barney Rubble');
+    
+According to the RFC the following 'simple' nodes should only have one element, this is
+not enforced by this module, so for example you can have multiple URL's if you wish.
+
+vCard Spec: 'simple'	Alias
+--------------------    --------
+FN 			fullname
+BDAY 			birthday
+MAILER
+TZ 			timezone
+TITLE 
+ROLE 
+NOTE 
+PRODID 
+REV 
+SORT-STRING 
+UID
+URL
+VERSION 
+CLASS
+
+=head2 more complex vcard nodes
+
+vCard Spec	Alias		Methods on object
+-----------	----------	-----------------
+N		name		'family','given','middle','prefixes','suffixes'
+ADR		addresses	'po_box','extended','street','city','region','post_code','country'
+NICKNAME
+PHOTO
+GEO				'lat','long'
+ORG				'name','unit'
+TELS		phones
+LABELS
+EMAILS
+
+  my $addresses = $vcard->get({ 'element_type' => 'addresses' });
+  foreach my $address (@{$addresses}) {
+	print $address->street();
   }
 
-Go through each object, then call what ever
-methods you want.
+  # Setting values on an address element
+  $addresses->[0]->street('The burrows');
+  $addresses->[0]->region('Wimbeldon common');
 
-=head2 addresses()
-
-This method returns an array or array ref containing 
-Text::vCard::Part::Address objects.
-
-=cut
-
-sub addresses {
-	my ($self,$types) = @_;
-	return $self->_get_of_type('ADR',$types);
-}
-
-=head2 tels()
-	
-This method returns an array or array ref containing 
-Text::vCard::Part::Basic objects.
-
-=cut
-
-sub tels {
-	my ($self,$types) = @_;
-	return $self->_get_of_type('TEL',$types);
-}
-
-=head2 lables()
-	
-This method returns an array or array ref containing 
-Text::vCard::Part::Basic objects.
-
-=cut
-
-sub lables {
-	my ($self,$types) = @_;
-	return $self->_get_of_type('LABLE',$types);
-}
-
-=head2 emails()
-	
-This method returns an array or array ref containing 
-Text::vCard::Part::Basic objects.
-
-=cut
-
-sub emails {
-	my ($self,$types) = @_;
-	return $self->_get_of_type('EMAIL',$types);
-}
-
-=head1 SINGLETYPE METHODS
-
-The following list of methods can be accessed as follows:
-
- my $value = $vcard->method();
-
-Undef will be returned if a value does not exists,
-otherwise the value is a scalar.
-
-and can set a new value as follows:
-
- $vcard->method($value);
-
-=head2 fn()
-
-This method retrieves or sets the full name of the person
-associated with the card
-
-=head2 bday()
-
-This method retrieves or sets the birthday of the person
-associated with the card.
-
-=head2 mailer()
-
-This method retrieves or sets the type of email software
-the person associated with the card uses.
-
-=head2 title()
-
-This method retrieves or sets the title of the person
-associated with the card.
-
-=head2 role()
-
-This method retrieves or sets the role of the person
-associated with the card based on the X.520 Business Category
-explanatory attribute
-
-=head2 note()
-
-This method retrieves or sets a note for the person
-associated with the card
-
-=head2 prodid()
-
-This method retrieves or sets the product identifier that
-created the vCard
-
-=head2 rev()
-
-This method retrieves or sets the revision (e.g. verson)
-of the vcard, of the format date-time or just date. 
-
-=head2 sort-string()
-
-This method retrieves or sets the family name or given name 
-text to be used for national-language-specific sorting of 
-the fn and name types for the person associated with the card. 
-
-=head2 url()
-
-This method retrieves or sets a single url associated with 
-the card.
-
-=head2 version()
-
-This method retrieves or sets the version of the vCard
-format used to create the for the card.
-
-=head2 class()
-
-This method retrieves or sets the access classification for
-the vCard object
-
-=head1 TYPED SINGLE ELEMENTS METHODS
-
-Accessing lists of elements
-
-  my $object = $vcard->method();
-  
-  $object->value();
-  $object->value($new_value);
-  $object->is_type('fax');
-  $object->add_type('home');
-  $object->remove_type('work');
-  
-=head2 tz()
-
-Time Zone
-
-=cut
-
-# This doesn't feel right, I'm sure we shouldn't need
-# arrays here, but that's what we are getting.
-
-sub tz {
-	my $self = shift;
-	if(defined $self->{TZ} && defined $self->{TZ}->[0]) {
-		return $self->{TZ}->[0];	
-	}
-	return undef;
-}
-
-=head2 uid()
-
-Unique Identifier
-
-=cut
-
-sub uid {
-	my $self = shift;
-	if(defined $self->{UID} && defined $self->{UID}->[0]) {
-		return $self->{UID}->[0];
-	}
-	return undef;
-}
-
-=head1 MULTIPLETEXT METHODS
-
-  my $value = $vcard->method();
-  $vcard->method($value);
-  $vcard->method(\@value);
-
-The following methods will return a string, containing a
-list of values which are comma seperated. They can be altered
-by passing in a scalar or an array refernce (this is joined
-with commas internally and set as the new value).
-
-=head2 nickname()
-
-Nicknames associated with the person.
-
-=head2 org()
-
-Organisations associated with the person.
-
-=head2 categories()
-
-Categories associated with the person.
+  # Checking an address is a specific type
+  $addresses->[0]->is_type('fax');
+  $addresses->[0]->add_types('home');
+  $addresses->[0]->remove_types('work');
 
 =head1 BINARY METHODS
 
@@ -335,179 +236,44 @@ API still to be finalised.
 
 =cut
 
-#=head1 ADDING ELEMENTS
-#my $address = $vcard->address_new({
-#	'street' => 'The Street',
-#});
-
-#sub address_new {
-#	my($self,$conf) = @_;
-#	$conf->{'new_object'}
-#	return Text::vCard::Part::Address->new($conf); 	
-#}
-
-
 sub DESTROY {
 }
 
 
-sub AUTOLOAD {
-	my $name = $AUTOLOAD;
-	$name =~ s/.*://;
+=head2 get_lookup
 
-	croak "No object supplied" unless $_[0];
+This method is used internally to lookup those nodes which have multiple elements,
+e.g. GEO has lat and long, N (name) has family, given, middle etc.
 
-	# Upper case the name
-	$name = uc($name);
-	
-	my $varHandler = varHandler();
-	
-	if(defined $varHandler->{$name}) {
-		if($varHandler->{$name} eq 'singleText' or $varHandler->{$name} eq 'multipleText' ) {
-			if($_[1]) {
-				if(ref($_[1]) eq 'ARRAY') {
-					$_[0]->{$name}->{value} = join(',', @{$_[1]});
-				} else {
-					$_[0]->{$name}->{value} = $_[1];
-				}
-			}
-			return $_[0]->{$name}->{value} if defined $_[0]->{$name}->{value};
-			return undef;
-		} elsif($varHandler->{$name} eq 'singleBinary') {
-			# photo etc..
-		} 
-	} else {
-		croak "Unknown method $name";
-	}
-}	
+If you wish to extend this package (for custom attributes), use this as a base and
+replace the get_lookup method, every thing else should just work [TM]
 
-# methods for Text::vFile - to make it work!
+=cut 
 
-# This shows mapping of data type based on RFC to the appropriate handler
-sub varHandler {
-
-	return {
-        'FN'          => 'singleText',
-        'BDAY'        => 'singleText',
-        'MAILER'      => 'singleText',
-        'TITLE'       => 'singleText',
-        'ROLE'        => 'singleText',
-        'NOTE'        => 'singleText',
-        'PRODID'      => 'singleText',
-        'REV'         => 'singleText',
-        'SORT-STRING' => 'singleText',
-        'URL'         => 'singleText',
-        'VERSION'     => 'singleText',
-        'CLASS'       => 'singleText',
-	};
-};
-
-# If the part has default types and none it self use them.
-sub typeDefault {
-
-    return {
-        'ADR'     => [ qw(intl postal parcel work) ],
-        'LABEL'   => [ qw(intl postal parcel work) ],
-        'TEL'     => [ qw(voice) ],
-        'EMAIL'   => [ qw(internet) ],
-    };
-
+sub get_lookup {
+	my $self = shift;
+	return \%lookup;
 }
 
-sub load_ADR {
-	my $self=shift;
-	my $item = $self->SUPER::load_singleTextTyped(@_);
-	return Text::vCard::Part::Address->new($item); 
-}
+=head2 get_of_type()
 
-sub load_N {
-	my $self=shift;
-	my $item = $self->SUPER::load_singleText(@_);
-	return Text::vCard::Part::Name->new($item); 
-}
+  my $list = $vcard->get_of_type($element_type,\@types);
 
-sub load_GEO {
-	my $self=shift;
-	my $item = $self->SUPER::load_singleText(@_);
-	return Text::vCard::Part::Geo->new($item); 
-}
+It is probably easier just to use the get() method, which inturn calls
+this method.
 
-sub load_NICKNAME {
-	my $self=shift;
-	my $item = $self->SUPER::load_singleText(@_);
-	return Text::vCard::Part::Basic->new($item); 
-}
-
-sub load_ORG {
-	my $self=shift;
-	my $item = $self->SUPER::load_singleText(@_);
-	return Text::vCard::Part::Basic->new($item); 
-}
-
-sub load_CATEGORIES {
-	my $self=shift;
-	my $item = $self->SUPER::load_singleText(@_);
-	return Text::vCard::Part::Basic->new($item); 
-}
-
-sub load_TEL {
-	my $self=shift;
-	my $item = $self->SUPER::load_singleTextTyped(@_);
-	return Text::vCard::Part::Basic->new($item); 
-}
-
-sub load_LABLE {
-	my $self=shift;
-	my $item = $self->SUPER::load_singleTextTyped(@_);
-	return Text::vCard::Part::Basic->new($item); 
-}
-
-sub load_EMAIL {
-	my $self=shift;
-	my $item = $self->SUPER::load_singleTextTyped(@_);
-	return Text::vCard::Part::Basic->new($item); 
-}
-
-sub load_TZ {
-	my $self=shift;
-	my $item = $self->SUPER::load_singleTextTyped(@_);
-	return Text::vCard::Part::Basic->new($item); 
-}
-
-sub load_UID {
-	my $self=shift;
-	my $item = $self->SUPER::load_singleTextTyped(@_);
-	return Text::vCard::Part::Basic->new($item); 
-}
-
-sub load_PHOTO {
-	my $self=shift;
-	my $item = $self->SUPER::load_singleBinary(@_);
-	return Text::vCard::Part::Binary->new($item); 
-}
-
-sub load_SOUND {
-	my $self=shift;
-	my $item = $self->SUPER::load_singleBinary(@_);
-	return Text::vCard::Part::Binary->new($item); 
-}
-
-sub load_KEY {
-	my $self=shift;
-	my $item = $self->SUPER::load_singleBinary(@_);
-	return Text::vCard::Part::Binary->new($item); 
-}
-
-sub load_LOGO {
-	my $self=shift;
-	my $item = $self->SUPER::load_singleBinary(@_);
-	return Text::vCard::Part::Binary->new($item); 
-}
+=cut
 
 # Used to get the right elements
-sub _get_of_type {
+sub get_of_type {
 	my ($self, $element_type, $types) = @_;
-	
+
+	# Upper case the name
+	$element_type = uc($element_type);
+
+	# See if there is an alias for it
+	$element_type = uc($node_aliases{$element_type}) if defined $node_aliases{$element_type};
+
 	return undef unless defined $self->{$element_type};
 
 	if($types) {
@@ -515,27 +281,31 @@ sub _get_of_type {
 		my @of_type;
 		if(ref($types) eq 'ARRAY') {
 			@of_type = @{$types};
+			#	print "T A: " . join('-',@{$types}) . "\n";
 		} else {
 			push(@of_type, $types);
+			#	print "T: $types\n";
 		}
 		my @to_return;
 		foreach my $element (@{$self->{$element_type}}) {
 			my $check = 1; # assum ok for now
 			foreach my $type (@of_type) {
-				# set it as bad if we don't match
+				# set it as bad if we don't match				
 				$check = 0 unless $element->is_type($type);
 			}
 			if($check == 1) {
+				#	print "Adding: $element->street() \n";
 				push(@to_return, $element);
 			}
 		}
 		
 		return undef unless scalar(@to_return);
-		
 		# Make prefered value first
 		@to_return = sort {
-			$b->is_pref() <=> $a->is_pref()
+			_sort_prefs($b) <=> _sort_prefs($a)
 		} @to_return;
+
+		#	print "Returning: " . Dumper(@to_return);
 
 		return wantarray ? @to_return : \@to_return;	
 	
@@ -544,6 +314,54 @@ sub _get_of_type {
 		return wantarray ? @{$self->{$element_type}} : $self->{$element_type};	
 	}	
 }
+
+sub _sort_prefs {
+	my $check = shift;
+	if($check->is_type('pref')) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+# Private method for adding nodes
+sub _add_node {
+	my($self,$conf) = @_;
+
+	my $value_fields = $self->get_lookup();
+	
+	my $node_type = uc($conf->{node_type});
+
+	my $field_list;
+				
+	if(defined $value_fields->{$node_type}) {
+		# We know what the field list is
+		$field_list = $value_fields->{$node_type};	
+	} else {
+		# No defined fields - use just the 'value' one
+		$field_list = \@default_field;
+	}
+	unless(defined $self->{$node_type}) {
+		# create space to hold list of node objects
+		my @node_list_space;
+		$self->{$node_type} = \@node_list_space;
+	}	
+	my $last_node;
+	foreach my $node_data (@{$conf->{data}}) {
+		my $node_obj = Text::vCard::Node->new({
+			node_type => $node_type,
+			fields => $field_list,
+			data => $node_data,
+		});
+
+		push(@{$self->{$node_type}}, $node_obj);
+		
+		# store the last node so we can return it.
+		$last_node = $node_obj;
+	}
+	return $last_node;
+}
+
 
 =head1 AUTHOR
 
@@ -555,15 +373,9 @@ Copyright (c) 2003 Leo Lapworth. All rights reserved.
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
 
-=head1 ACKNOWLEDGEMENTS
-
-Jay J. Lawrence for being a fantastic person to bounce ideas
-off and for creating Text::vFile from our discussions.
-
 =head1 SEE ALSO
 
-Text::vFile::Base, Text::vFile, Text::vCard::Part::Address, Text::vCard::Part::Name,
-Text::vCard::Part::Basic, Text::vCard::Part::Binary, Text::vCard::Part::Geo
+Text::vCard::Address, Text::vCard::Node
 
 =cut
 

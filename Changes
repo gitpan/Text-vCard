@@ -1,5 +1,15 @@
 Revision history for Perl extension Text::vCard.
 
+1.1 Wed Sept 15th 2003
+	- Restructured (it's Tom's fault) so we use Addressbook as the main
+	interface, and Text::vCard is a single card, in the Addressbook object
+	- Renamed add_type to add_types
+	- Renamed remove_type to remove_types
+	- Created Text::vCard::Node to replace all Text::vCard::Part*
+	- Dropped requirement for Text::vFile
+	- Created new and load methods, dropped iterator
+	- Renamed update_value to export_data and changed returned value
+
 1.0  Wed July  23rd 11:18:00 2003
 	- More doc fixing
 	- Fixed bug in UID and TZ
