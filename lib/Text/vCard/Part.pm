@@ -3,6 +3,34 @@ package Text::vCard::Part;
 use strict;
 my $VERSION = '0.02';
 
+=head1 NAME
+
+Text::vCard::Part - Parent object to handle several parts of a vCard
+
+=head1 
+
+	package YOUR_PACKAGE_NAME_HERE;
+	use base qw(Text::vCard::Part);
+
+	sub config {
+		my %config = (
+			# If the package refers to a part with multipul values
+			'field_names' 		=> ['pobox','extad',...],
+		);
+		return \%config;
+	}
+
+=head1 DESCRIPTION
+
+This package can be inherited from when additional parts of a vCard
+need to become objects, such as Address and Name. The created objects
+are called from Text::vCard so this probably isn't something you
+want to do unless your helping maintain Text::vCard as well!
+
+=head1 METHODS
+
+=cut
+
 sub new {
 	my ($proto,$item) = @_;
     my $class = ref($proto) || $proto;
@@ -88,40 +116,19 @@ sub remove_type {
 
 }
 
-# Preloaded methods go here.
-
-1;
-__END__
-# Below is stub documentation for your module. You better edit it!
-
-=head1 NAME
-
-Text::vCard::Part - Perl extension for blah blah blah
-
-=head1 SYNOPSIS
-
-  use Text::vCard::Part;
-  blah blah blah
-
-=head1 DESCRIPTION
-
-Stub documentation for Text::vCard::Part, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
-
-Blah blah blah.
-
 =head2 EXPORT
 
 None by default.
 
-
 =head1 AUTHOR
 
-A. U. Thor, a.u.thor@a.galaxy.far.far.away
+Leo Lapworth, LLAP@cuckoo.org
 
 =head1 SEE ALSO
 
-perl(1).
+Text::vCard.
 
 =cut
+
+1;
+

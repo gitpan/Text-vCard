@@ -1,6 +1,11 @@
 Revision history for Perl extension Text::vCard.
 
-0.01  Mon May  5 11:50:20 2003
-	- original version; created by h2xs 1.2 with options
-		-A -X -n Text::vCard
+0.3  Wed May  7 10:20:20 2003
+	- Cleaned up the docs, structure (now in lib/) and Makefile.PL
+
+0.2  Tue May  6 12:30:20 2003
+	- Release for Jay to see
+
+0.1  Mon May  5 11:50:20 2003
+	- original version
 

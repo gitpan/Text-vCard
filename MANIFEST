@@ -2,4 +2,7 @@ Changes
 MANIFEST
 Makefile.PL
 t/01.t
-vCard.pm
+lib/Text/vCard.pm
+lib/Text/vCard/Part.pm
+lib/Text/vCard/Part/Address.pm
+lib/Text/vCard/Part/Name.pm

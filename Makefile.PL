@@ -1,8 +1,16 @@
 use ExtUtils::MakeMaker;
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
+
+my $VERSION = '0.3';
+
+my $ABSTRACT = "Module for parsing and creating vCard (RFC 2426) address";
+
 WriteMakefile(
     'NAME'		=> 'Text::vCard',
-    'VERSION_FROM'	=> 'vCard.pm', # finds $VERSION
-    'PREREQ_PM'		=> {}, # e.g., Module::Name => 1.1
+	'ABSTRACT'	=> $ABSTRACT,
+	'AUTHOR'	=> 'Leo Lapworth',
+    'VERSION'	=> $VERSION, # finds $VERSION
+    'PREREQ_PM'		=> {
+    	'Text::vFile' => '',
+    	'Test::More' => '0.1',
+    }, 
 );

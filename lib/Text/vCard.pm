@@ -4,10 +4,34 @@ use Text::vCard::Part::Address;
 # See this module for your basic parser functions
 use base qw(Text::vFile::Base);
 
-my $VERSION = '0.02';
-
 # Tell vFile that BEGIN:VCARD line creates one of these objects
 $Text::vFile::classMap{'VCARD'}=__PACKAGE__;
+
+=head1 NAME
+
+Text::vCard - a package to parse, edit and create vCards (RFC 2426) 
+
+=SYNOPSIS
+
+    use Text::vCard;
+    my $loader = Text::vCard->loader( source => "xmas_card_list.vcf" );
+
+    while (my $vcard = $loader->next) {
+        $vcard->....;
+    }
+
+    # or even sexier
+    
+    while (my $vcard = <$loader> ) {
+        $vcard->...;
+    }
+
+=head1 DESCRIPTION
+
+Still under active development.
+    
+=cut    
+    
 
 # This shows mapping of data type based on RFC to the appropriate handler
 sub varHandler {
@@ -87,5 +111,29 @@ sub addresses {
 	
 }
 
+=head2 EXPORT
+
+None by default.
+
+=head1 AUTHOR
+
+Leo Lapworth, LLAP@cuckoo.org
+
+=head1 COPYRIGHT
+
+Copyright (c) 2003 Leo Lapworth. All rights reserved.
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+=head1 ACKNOWLEDGEMENTS
+
+Jay J. Lawrence for being a fantastic person to bounce ideas
+of and for creating Text::vFile from our discussions.
+
+=head1 SEE ALSO
+
+Text::vFile::Base, Text::vFile.
+
+=cut
 
 1;

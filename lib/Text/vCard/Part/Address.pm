@@ -4,9 +4,6 @@ use strict;
 
 use base qw(Text::vCard::Part);
 
-my $VERSION = '0.02';
-
-
 sub config {
 	my %config = (
 		'field_names' 		=> ['pobox','extad','street','locality','region','pcode','country'],
@@ -14,6 +11,16 @@ sub config {
 	return \%config;
 }
 
+=head1 NAME
+
+Text::vCard::Part::Address - Object to handle the address parts of a vCard
+
+=head1 DESCRIPTION
+
+You should not need to access this object directly it will be created as
+required when you parse a vCard. - not fully implimented!
+
+=head1 METHODS
 
 =head2 types()
 
@@ -61,7 +68,7 @@ This method removes a type from an address.
 
 
 
-=head1 
+=head1 STILL TO IMPLIMENT
 
 # These can take a scalar or an array, return the 'pref' if possible or the right order.
 
@@ -98,40 +105,18 @@ $new_address->city("ottawa");
 
 =cut
 
-# Preloaded methods go here.
-
-1;
-__END__
-# Below is stub documentation for your module. You better edit it!
-
-=head1 NAME
-
-Text::vCard::Part::Address - Perl extension for blah blah blah
-
-=head1 SYNOPSIS
-
-  use Text::vCard::Part::Address;
-  blah blah blah
-
-=head1 DESCRIPTION
-
-Stub documentation for Text::vCard::Part::Address, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
-
-Blah blah blah.
-
 =head2 EXPORT
 
 None by default.
 
-
 =head1 AUTHOR
 
-A. U. Thor, a.u.thor@a.galaxy.far.far.away
+Leo Lapworth, LLAP@cuckoo.org
 
 =head1 SEE ALSO
 
-perl(1).
+Text::vCard.
 
 =cut
+
+1;
