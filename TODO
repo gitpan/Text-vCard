@@ -1,0 +1,42 @@
+
+Stuff still todo:
+
+More tests all round!
+
+Supply 'types' of addresses, emails etc required.
+
+Take a scalar or an array, return the 'pref' if possible or the right order.
+
+e.g.
+
+  foreach my $address ( $card->addresses(['home','postal']) {
+    $address->boo;
+  }
+- and/or -
+  foreach my $address ( $card->addresses('home') {
+    $address->boo;
+  }
+
+Adding addresses, emails and other eliments belonging to a list
+
+  $card->address_new(
+    'street' => "74 Bayswater",
+    'city' => "Ottawa",
+    'type' => [ 'home', 'work' ],
+  );
+- or -
+  my $new_address = $card->address_new;
+  $new_address->street( "74 Bayswater" );
+  $new_address->city("ottawa");
+  ....
+
+
+my $agents = $vcard->agent();
+
+Improve API for Text::vCard::Part::Binary
+
+Work with Jay on out put methods: 
+
+- write out vcards
+- parse version 2.1 of vCard format
+

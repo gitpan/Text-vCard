@@ -4,7 +4,7 @@ use strict;
 
 use lib qw( ./blib/lib ../blib/lib );
 
-use Test::More tests => 25;
+use Test::More tests => 28;
 use Data::Dumper;
 # Check we can load module
 BEGIN { use_ok( 'Text::vCard' ); }
@@ -67,4 +67,13 @@ my %name_test = (
 while( my($field,$value) = each %name_test ) {
 	is($name->$field(),$value,"N: $field matches");
 }
+
+my $tels = $vcard->tels();
+my $tel1 = $tels->[0];
+is($tel1->value(),'020 666 6666','TEL: Home phone number ok');
+ok($tel1->is_type('home'),'TEL: Home type match');
+ok(!$tel1->is_type('work'),'TEL: Not work type as expected');
+
+
+#print Dumper($vcard);
 

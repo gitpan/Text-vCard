@@ -5,13 +5,14 @@ use strict;
 
 use Text::vCard::Part::Name;
 use Text::vCard::Part::Address;
-use Text::vCard::Part::MultipleText;
+use Text::vCard::Part::Basic;
+use Text::vCard::Part::Binary;
 use Text::vCard::Part::Geo;
 
 # See this module for your basic parser functions
 use base qw(Text::vFile::Base);
 use vars qw ( $AUTOLOAD $VERSION );
-$VERSION = '0.6';
+$VERSION = '0.7';
 
 # Tell vFile that BEGIN:VCARD line creates one of these objects
 $Text::vFile::classMap{'VCARD'}=__PACKAGE__;
@@ -36,38 +37,29 @@ but give me a few weeks to get a finished version out!
     $vcard->....;
   }
 
-# or even sexier
+or even sexier
 
   while (my $vcard = <$loader> ) {
     $vcard->...;
   }
 
+See Text::vCard for more options, such as parsing a string.
+
 =head1 DESCRIPTION
 
 Still under active development.
 
-=head1 LIST METHODS
+=head1 GENERAL METHODS
 
-=head2 addresses()
+=head2 split_value()
 
-  my @addresses = $vcard->addresses();
-  my $address_array_ref = $vcard->addresses();
-	
-This method returns an array or array ref containing 
-Text::vCard::Part::Address objects.
-
-TODO: Supply 'types' of addresses required.
-
-=cut
-
-sub addresses {
-	my $self = shift;
-	
-	my @list = @{$self->{ADR}};
-	
-	return wantarray ? @{$self->{ADR}} : $self->{ADR};	
-	
-}
+  my @list = $vcard->split_value($value);
+  my $list_ref = $vcard->split_value($value);
+  
+This method splits a value on non-escaped commas;
+into an array, or array ref (depending on calling context)
+it is useful as some methods (e.g. org and nickname) 
+will return the string non-seperated.
 
 =head2 name()
 
@@ -84,6 +76,83 @@ sub name {
 		return $self->{N};	
 	}
 	return undef;
+}
+
+=head1 LIST METHODS
+
+Accessing lists of eliments
+
+  my @list = $vcard->method();
+  my $list_array_ref = $vcard->method();
+  
+  foreach my $object (@list) {
+  	$object->value();
+  	$object->value($new_value);
+  	$object->is_type('fax');
+  	$object->add_type('home');
+  	$object->remove_type('work');
+  }
+
+TODO: specify type(s) if required, adding new eliments
+
+=head2 addresses()
+
+This method returns an array or array ref containing 
+Text::vCard::Part::Address objects.
+
+=cut
+
+sub addresses {
+	my $self = shift;
+	
+	return undef unless defined $self->{ADR};
+	
+	return wantarray ? @{$self->{ADR}} : $self->{ADR};	
+}
+
+=head2 tels()
+	
+This method returns an array or array ref containing 
+Text::vCard::Part::Basic objects.
+
+=cut
+
+sub tels {
+	my $self = shift;
+	
+	return undef unless defined $self->{TEL};
+	
+	return wantarray ? @{$self->{TEL}} : $self->{TEL};	
+}
+
+=head2 lables()
+	
+This method returns an array or array ref containing 
+Text::vCard::Part::Basic objects.
+
+=cut
+
+sub lables {
+	my $self = shift;
+	
+	return undef unless defined $self->{LABLE};
+	
+	return wantarray ? @{$self->{LABLE}} : $self->{LABLE};	
+}
+
+=head2 emails()
+	
+This method returns an array or array ref containing 
+Text::vCard::Part::Basic objects.
+
+=cut
+
+sub emails {
+	my $self = shift;
+	
+	return undef unless defined $self->{EMAIL};
+	
+	return wantarray ? @{$self->{EMAIL}} : $self->{EMAIL};	
 }
 
 =head1 SINGLETYPE METHODS
@@ -160,6 +229,47 @@ format used to create the for the card.
 This method retrieves or sets the access classification for
 the vCard object
 
+
+=head1 TYPED SINGLE ELIMENTS METHODS
+
+Accessing lists of eliments
+
+  my $object = $vcard->method();
+  
+  $object->value();
+  $object->value($new_value);
+  $object->is_type('fax');
+  $object->add_type('home');
+  $object->remove_type('work');
+  
+=head2 tz()
+
+Time Zone
+
+=cut
+
+sub tz {
+	my $self = shift;
+	if(defined $self->{TZ}) {
+		return $self->{TZ};	
+	}
+	return undef;
+}
+
+=head2 uid()
+
+Unique Identifier
+
+=cut
+
+sub uid {
+	my $self = shift;
+	if(defined $self->{UID}) {
+		return $self->{UID};	
+	}
+	return undef;
+}
+
 =head1 MULTIPLETEXT METHODS
 
   my $value = $vcard->method();
@@ -183,16 +293,20 @@ Organisations associated with the person.
 
 Categories associated with the person.
 
-=head1 TODO
+=head1 BINARY METHODS
 
-AGENT
+These methods allow access to what are potentially
+binary values such as a photo or sound file.
 
-'LABEL'
-'TEL'
-'EMAIL'
- 'TZ'
-'UID'
+API still to be finalised.
 
+=head2 photo()
+
+=head2 sound()
+
+=head2 key()
+
+=head2 logo()
 
 =cut
 
@@ -230,16 +344,10 @@ sub AUTOLOAD {
 	}
 }	
 
-#### Stuff to make it work!
+# methods for Text::vFile - to make it work!
 
 # This shows mapping of data type based on RFC to the appropriate handler
 sub varHandler {
-
-# Handled by a 'part' object
-#        'N'           => 'N',
-#        'ADR'         => 'ADR',
-#        'GEO'         => 'multipleText',
-
 
 	return {
         'FN'          => 'singleText',
@@ -254,13 +362,6 @@ sub varHandler {
         'URL'         => 'singleText',
         'VERSION'     => 'singleText',
         'CLASS'       => 'singleText',
-        'NICKNAME'    => 'multipleText',
-        'ORG'         => 'multipleText',
-        'CATEGORIES'  => 'multipleText',
-        'KEY'         => 'singleBinary',
-        'PHOTO'       => 'singleBinary',
-        'SOUND'       => 'singleBinary',
-        'LOGO'        => 'singleBinary',
 	};
 };
 
@@ -276,24 +377,17 @@ sub typeDefault {
 
 }
 
-# Load the address object
 sub load_ADR {
-
 	my $self=shift;
-	# This is what an address is based upon
 	my $item = $self->SUPER::load_singleTextTyped(@_);
-
 	return Text::vCard::Part::Address->new($item); 
-
 }
 
-# Load the N object
 sub load_N {
 	my $self=shift;
 	my $item = $self->SUPER::load_singleText(@_);
 	return Text::vCard::Part::Name->new($item); 
 }
-
 
 sub load_GEO {
 	my $self=shift;
@@ -304,24 +398,74 @@ sub load_GEO {
 sub load_NICKNAME {
 	my $self=shift;
 	my $item = $self->SUPER::load_singleText(@_);
-	return Text::vCard::Part::MultipleText->new($item); 
+	return Text::vCard::Part::Basic->new($item); 
 }
 
 sub load_ORG {
 	my $self=shift;
 	my $item = $self->SUPER::load_singleText(@_);
-	return Text::vCard::Part::MultipleText->new($item); 
+	return Text::vCard::Part::Basic->new($item); 
 }
 
 sub load_CATEGORIES {
 	my $self=shift;
 	my $item = $self->SUPER::load_singleText(@_);
-	return Text::vCard::Part::MultipleText->new($item); 
+	return Text::vCard::Part::Basic->new($item); 
 }
 
-=head2 EXPORT
+sub load_TEL {
+	my $self=shift;
+	my $item = $self->SUPER::load_singleTextTyped(@_);
+	return Text::vCard::Part::Basic->new($item); 
+}
 
-None by default.
+sub load_LABLE {
+	my $self=shift;
+	my $item = $self->SUPER::load_singleTextTyped(@_);
+	return Text::vCard::Part::Basic->new($item); 
+}
+
+sub load_EMAIL {
+	my $self=shift;
+	my $item = $self->SUPER::load_singleTextTyped(@_);
+	return Text::vCard::Part::Basic->new($item); 
+}
+
+sub load_TZ {
+	my $self=shift;
+	my $item = $self->SUPER::load_singleTextTyped(@_);
+	return Text::vCard::Part::Basic->new($item); 
+}
+
+sub load_UID {
+	my $self=shift;
+	my $item = $self->SUPER::load_singleTextTyped(@_);
+	return Text::vCard::Part::Basic->new($item); 
+}
+
+sub load_PHOTO {
+	my $self=shift;
+	my $item = $self->SUPER::load_singleBinary(@_);
+	return Text::vCard::Part::Binary->new($item); 
+}
+
+sub load_SOUND {
+	my $self=shift;
+	my $item = $self->SUPER::load_singleBinary(@_);
+	return Text::vCard::Part::Binary->new($item); 
+}
+
+sub load_KEY {
+	my $self=shift;
+	my $item = $self->SUPER::load_singleBinary(@_);
+	return Text::vCard::Part::Binary->new($item); 
+}
+
+sub load_LOGO {
+	my $self=shift;
+	my $item = $self->SUPER::load_singleBinary(@_);
+	return Text::vCard::Part::Binary->new($item); 
+}
 
 =head1 AUTHOR
 

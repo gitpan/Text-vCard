@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::vCard.
 
+0.7  Tue May  13 08:00:00 2003
+	- Added emails, tels, lables. Started Binary API
+
 0.6  Fri May  9 18:10:00 2003
 	- More accessor methods added, added the version to everything as well
 

@@ -3,7 +3,7 @@ package Text::vCard::Part::Geo;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = '0.6';
+$VERSION = '0.7';
 
 use base qw(Text::vCard::Part);
 
@@ -29,11 +29,13 @@ required when you parse a vCard. - not fully implimented!
 
   my $geo = $vcard->geo();
   my $latitude = $geo->latitude();
+  $geo->latitude($latitude);
 
 =head2 longitude()
 
   my $geo = $vcard->geo();
-  my $latitude = $geo->longitude();
+  my $longitude = $geo->longitude();
+  $geo->longitude($longitude);
 
 =cut
 

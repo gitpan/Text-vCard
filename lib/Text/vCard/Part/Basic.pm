@@ -1,9 +1,9 @@
-package Text::vCard::Part::MultipleText;
+package Text::vCard::Part::Basic;
 
 use strict;
 
 use vars qw($VERSION);
-$VERSION = '0.6';
+$VERSION = '0.7';
 
 use base qw(Text::vCard::Part);
 
@@ -15,8 +15,8 @@ sub config {
 
 =head1 NAME
 
-Text::vCard::Part::MultipleText- Object to handle the MultipleText elements
-of vCard (nickname, org, categories, geo)
+Text::vCard::Part::Basic - Object to handle the basic elements
+which need to be objects of vCard (nickname, org, categories)
 
 =head1 DESCRIPTION
 
@@ -24,8 +24,6 @@ You should not need to access this object directly it will be created as
 required when you parse a vCard. - not fully implimented!
 
 =cut
-
-
 
 =head2 EXPORT
 

@@ -1,4 +1,4 @@
-package Text::vCard::Part::Address;
+package Text::vCard::Part::Binary;
 
 use strict;
 
@@ -9,14 +9,13 @@ use base qw(Text::vCard::Part);
 
 sub config {
 	my %config = (
-		'field_names' 		=> ['po_box','extended','street','city','region','post_code','country'],
 	);
 	return \%config;
 }
 
 =head1 NAME
 
-Text::vCard::Part::Address - Object to handle the address parts of a vCard
+Text::vCard::Part::Binary - Object to handle the binary parts of a vCard
 
 =head1 DESCRIPTION
 
@@ -37,20 +36,6 @@ If supplied with a scalar argument the scalar will be set as
 the new value. If supplied with an array ref the values
 of the array ref will be joined with a comma and set as
 the new value.
-
-=head2 po_box()
-
-=head2 extended()
-
-=head2 street()
-
-=head2 city()
-
-=head2 region()
-
-=head2 post_code()
-
-=head2 country()
 
 =head1 OTHER METHODS
 

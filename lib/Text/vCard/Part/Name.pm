@@ -3,7 +3,7 @@ package Text::vCard::Part::Name;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = '0.6';
+$VERSION = '0.7';
 
 use base qw(Text::vCard::Part);
 
@@ -25,6 +25,10 @@ required when you parse a vCard. - not fully implimented!
 
 =head1 NAME DETAIL METHODS
 
+  my $value = $adddress->method();
+  $address->method($value);
+  $address->method(\@value);
+
 Called without any arguments the following methods return 
 a scalar containing the relevant information. This can
 be a list seperated by commas.
@@ -36,37 +40,13 @@ the new value.
 
 =head2 family()
 
-  my $family = $address->family();
-  $address->family($family);
-  $address->family(\@family);
-
 =head2 given()
-
-  my $given = $address->given();
-  $address->given($given);
-  $address->given(\@given);
  
- =head2 additional()
-
-  my $additional = $address->additional();
-  $address->additional($additional);
-  $address->additional(\@additional);
+=head2 additional()
   
 =head2 prefixes()
 
-  my $prefixes = $address->prefixes();
-  $address->prefixes($prefixes);
-  $address->prefixes(\@prefixes);
-
 =head2 suffixes()
-
-  my $suffixes = $address->suffixes();
-  $address->suffixes($suffixes);
-  $address->suffixes(\@suffixes);     
-
-=cut
-
-
 
 =head2 EXPORT
 

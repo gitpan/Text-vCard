@@ -1,10 +1,13 @@
 Changes
 MANIFEST
 Makefile.PL
+TODO
 t/01.t
+t/simple.vcf
 lib/Text/vCard.pm
 lib/Text/vCard/Part.pm
 lib/Text/vCard/Part/Address.pm
 lib/Text/vCard/Part/Name.pm
 lib/Text/vCard/Part/Geo.pm
-lib/Text/vCard/Part/MultipleText.pm
+lib/Text/vCard/Part/Basic.pm
+lib/Text/vCard/Part/Binary.pm
