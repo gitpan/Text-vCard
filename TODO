@@ -3,7 +3,7 @@ Addressbook:
 find()
 	- get vcards matching specific criteria
 vCard:
-	- work out what to do with group.<NODE>, discaring atm
+	- add get_group() or similar method
 
 overall:
 	- better doc examples

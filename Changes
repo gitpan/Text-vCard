@@ -1,5 +1,7 @@
 Revision history for Perl extension Text::vCard.
 
+1.92	- Added group() to Node and extract that info
+	  from the vcard if it is there.
 
 1.91
 	- Doc bug, said 'tels', should have been 'tel'.

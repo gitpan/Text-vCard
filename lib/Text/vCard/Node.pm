@@ -5,7 +5,7 @@ use Carp;
 use Data::Dumper;
 
 use vars qw ( $AUTOLOAD $VERSION );
-$VERSION = '1.91';
+$VERSION = '1.92';
 
 =head1 NAME
 
@@ -72,6 +72,7 @@ sub new {
    	bless($self, $class);
 
 	$self->{node_type} = uc($conf->{node_type}) if defined $conf->{node_type};
+	$self->group($conf->{group}) if defined $conf->{group};
 	
 	# Store the field order.
 	$self->{'field_order'} = $conf->{'fields'};
@@ -266,6 +267,31 @@ sub remove_types {
 			return 1;
 		}	
 	}
+	return undef;
+}
+
+=head2 group()
+
+  my $group = $node->group();
+
+If called without any arguments, this method returns the group 
+name if a node belongs to a group. Otherwise undef is returned.
+
+If an argument is supplied then this is set as the group name.
+
+All group names are always lowercased.
+
+For example, Apple Address book used 'itemN' to group it's
+custom X-AB... nodes with a TEL or ADR node.
+
+=cut
+
+sub group {
+	my $self = shift;
+	if(my $val = shift) {
+		$self->{group} = lc($val);
+	}
+	return $self->{group} if defined $self->{group};
 	return undef;
 }
 

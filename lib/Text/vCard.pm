@@ -10,7 +10,7 @@ use Text::vCard::Node;
 # See this module for your basic parser functions
 use base qw(Text::vFile::asData);
 use vars qw ($VERSION %lookup %node_aliases @simple);
-$VERSION = '1.91';
+$VERSION = '1.92';
 
 # If the node's data does not break down use this
 my @default_field = qw(value);
@@ -123,15 +123,17 @@ sub new {
 	if(defined $conf->{'asData_node'}) {
 		# Have a vcard data node being passed in
 		while(my ($node_type,$data) = each %{$conf->{'asData_node'}}) {
+			my $group;
 			if($node_type =~ /\./) {
 				# Version 3.0 supports group types, we do not
 				# so remove everything before '.'
-				$node_type =~ s/.+\.(.*)/$1/;
+				($group,$node_type) = $node_type =~ /(.+)\.(.*)/;
 			}
 			# Deal with each type (ADR, FN, TEL etc)
 			$self->_add_node({
 				'node_type' => $node_type,
 				'data' => $data,
+				'group' => $group,
 			});
 		}
 	} # else we're creating a new vCard
@@ -208,14 +210,21 @@ sub get {
 
 =head2 nodes
 
-  my $first_address = ($vcard->get({ 'node_type' => 'address' }))[0];
+  my $addresses = $vcard->get({ 'node_type' => 'address' });
+
+  my $first_address = $addresses->[0];
   
   # get the value
   print $first_address->street();
 
   # set the value
-  $fullname->value('Barney Rubble');
-    
+  $first_address->street('Barney Rubble');
+
+  # See if it is part of a group
+  if($first_address->group()) {
+	print 'Group: ' . $first_address->group();
+  }
+  
 According to the RFC the following 'simple' nodes should only have one element, this is
 not enforced by this module, so for example you can have multiple URL's if you wish.
 
@@ -417,6 +426,7 @@ sub _add_node {
 			node_type => $node_type,
 			fields => $field_list,
 			data => $node_data,
+			group => $conf->{group} || '',
 		});
 
 		push(@{$self->{$node_type}}, $node_obj);
@@ -440,7 +450,7 @@ with the vcard.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003 Leo Lapworth. All rights reserved.
+Copyright (c) 2005 Leo Lapworth. All rights reserved.
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
 

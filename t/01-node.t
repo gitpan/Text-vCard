@@ -80,6 +80,7 @@ is($nod_few_fields->post_code(),undef,'new() - less data, empty field returns un
 $nod_few_fields->post_code('postcode');
 is($nod_few_fields->post_code(),'postcode','new() - less data, set empty field');
 
+
 # Create without a node_type - should be fine
 my $no =  Text::vCard::Node->new({
 	fields => $fields,
@@ -97,10 +98,12 @@ my $node = Text::vCard::Node->new({
 	node_type => 'address', # Auto upper cased
 	fields => $fields,
 	data => \%data,
+	group => 'item1',
 });
 
 is($no->street(),$node->street(),'new() without node_type still works ok');
-
+is($node->group(),'item1','got group as it was set');
+is($node->group('FooF'),'foof','set node worked');
 ###
 # ORG
 ###
