@@ -45,9 +45,11 @@ eval {
 like($@,qr/Must supply a node_type/,'Croak if add_node() not supplied with node_type');
 
 my %data = (
-	'param' => {
-		'HOME,PREF' => undef,
-	},
+	'params' => [
+                  {
+                        'type' => 'HOME,PREF',
+                  },
+        ],
 	'value' => ';;First work address - street;Work city;London;Work PostCode;CountryName',
 );
 my @d = (\%data);

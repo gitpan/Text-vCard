@@ -5,7 +5,7 @@ use Carp;
 use Data::Dumper;
 
 use vars qw ( $AUTOLOAD $VERSION );
-$VERSION = '1.4';
+$VERSION = '1.5';
 
 =head1 NAME
 
@@ -84,27 +84,33 @@ sub new {
 	if(defined $conf->{'data'}) {
 		# Populate now, rather than later (via AUTOLOAD)
 		# store values into object
-		if(defined $conf->{'data'}->{'param'}) {
-			# Handle the parameters
+		if(defined $conf->{'data'}->{'params'}) {
 			my %params;
-			while(my($key,$value) = each %{$conf->{'data'}->{'param'}}) {
-				my $param_list = $key;
-				if(defined $value) {
-					$param_list = lc($value);
+			# Loop through array
+			foreach my $param_hash (@{$conf->{'data'}->{'params'}}) {
+				while(my($key,$value) = each %{$param_hash}) {
+					# go through each key/value pair
+					my $param_list = $key;
+					if(defined $value) {
+						# use value, not key as it's 'type' => 'CELL', not 'CELL' => undef
+						$param_list = $value;
+					}
+					map { $params{lc($_)} = 1 } split(',',$param_list);
 				}
-				map { $params{lc($_)} = 1 } split(',',$param_list);
 			}
 			$self->{params} = \%params;
 		}
+		
 		if(defined $conf->{'data'}->{'value'} ) {
 			# Store the actual data into the object
 			
 			# the -1 on split is so ;; values create elements in the array	
-			my @elements = split(';', $conf->{'data'}->{'value'},-1);
+			my @elements = split(/(?<!\\);/, $conf->{'data'}->{'value'},-1);
 			if(scalar(@elements) == scalar(@{$self->{'field_order'}})) {
+				# set the field values as the data e.g. $self->{street} = 'The street'
 				@{$self}{@{$self->{'field_order'}}} = @elements;
 			} else {
-				print Dumper(@elements);
+					print Dumper(@elements);
 				carp 'Data value had ' . scalar(@elements) . ' elements expecting ' . scalar(@{$self->{'field_order'}});
 			}
 		}

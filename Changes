@@ -1,5 +1,9 @@
 Revision history for Perl extension Text::vCard.
 
+1.5 Wed  Oct 6th 2004
+	- Change to support asData change for 'type=home;type=pref'
+	- Change to support escaped ; (\;) in data - 'note' now works
+
 1.4 Tue  Oct 5th 2004
 	- Patches from Arron for XML::Generator::vCard
 	- put auto methods in sub rather than closure for vCard.pm

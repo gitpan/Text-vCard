@@ -17,9 +17,11 @@ local $SIG{__WARN__} = sub { die $_[0] };
 
 # ok data
 my %data = (
-	'param' => {
-		'HOME,PREF' => undef,
-	},
+	'params' => [
+		  {
+			'type' => 'HOME,PREF',
+		  },
+	],
 	'value' => ';;First work address - street;Work city;London;Work PostCode;CountryName',
 );
 

@@ -8,15 +8,3 @@ vCard:
 overall:
 	- better doc examples
 
-Talk to richard, get him to fix:
------------
-use Text::vFile::asData;
-use Data::Dumper;
-
-my $str = 'TEL;type=HOME;type=pref:020 666 6666
-TEL;type=CELL:0777 777 7777';
-
-my $data = Text::vFile::asData->new->parse_lines(split("\n",$str));
-print Dumper($data);
--------
-type = HOME is lost
