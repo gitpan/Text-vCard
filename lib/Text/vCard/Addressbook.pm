@@ -10,7 +10,7 @@ use Text::vCard;
 # See this module for your basic parser functions
 use base qw(Text::vFile::asData);
 use vars qw ($VERSION);
-$VERSION = '1.9';
+$VERSION = '1.91';
 
 =head1 NAME
 
@@ -25,8 +25,7 @@ Text::vCard::Addressbook - a package to parse, edit and create multiple vCards (
   });
 
   foreach my $vcard ($address_book->vcards()) {
-  	my @full_name = $vcard->get('fn');
-	print "Got card for " . $full_name[0] . "\n";
+	print "Got card for " . $vcard->fullname() . "\n";
   }
 
 =head1 DESCRIPTION

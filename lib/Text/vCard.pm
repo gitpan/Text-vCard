@@ -10,7 +10,7 @@ use Text::vCard::Node;
 # See this module for your basic parser functions
 use base qw(Text::vFile::asData);
 use vars qw ($VERSION %lookup %node_aliases @simple);
-$VERSION = '1.9';
+$VERSION = '1.91';
 
 # If the node's data does not break down use this
 my @default_field = qw(value);
@@ -27,7 +27,7 @@ my @default_field = qw(value);
 	'FULLNAME' 	=> 'FN',
 	'BIRTHDAY'	=> 'BDAY',
 	'TIMEZONE'	=> 'TZ',
-	'PHONES'	=> 'TELS',
+	'PHONES'	=> 'TEL',
 	'ADDRESSES'	=> 'ADR',
 	'NAME'		=> 'N',
 );
@@ -170,7 +170,7 @@ sub add_node {
 The following method allows you to extract the contents from the vCard.
 
   # get all elements
-  $nodes = $vcard->get('tels');
+  $nodes = $vcard->get('tel');
 
   # Just get the home address
   my $nodes = $vcard->get({
@@ -181,7 +181,7 @@ The following method allows you to extract the contents from the vCard.
   # get all phone number that matches serveral types
   my @types = qw(work home);
   my $nodes = $vcard->get({
-	'node_type' => 'tels',
+	'node_type' => 'tel',
 	'types' => \@types,
   });
  
@@ -258,7 +258,7 @@ or all lowercase method names.
   N             name            'family','given','middle','prefixes','suffixes'
   ADR           addresses       'po_box','extended','street','city','region','post_code','country'
   GEO                           'lat','long'
-  TELS          phones
+  TEL           phones
   LABELS
   ORG                           'name','unit' (unit is a special case and will return an array reference)
 
@@ -430,6 +430,13 @@ sub _add_node {
 =head1 AUTHOR
 
 Leo Lapworth, LLAP@cuckoo.org
+
+=head1 BUGS
+
+There is an issue with the module this relies on to parse
+vcards (Text::vFile::asData) which segfaults if the vcard
+contains very long lines - e.g. if there is an image associated
+with the vcard.
 
 =head1 COPYRIGHT
 

@@ -5,7 +5,7 @@ use Carp;
 use Data::Dumper;
 
 use vars qw ( $AUTOLOAD $VERSION );
-$VERSION = '1.9';
+$VERSION = '1.91';
 
 =head1 NAME
 

@@ -1,5 +1,9 @@
 Revision history for Perl extension Text::vCard.
 
+
+1.91
+	- Doc bug, said 'tels', should have been 'tel'.
+
 1.9 
 	- removed import() from docs as not used now
 	- changed Node so excepts data with less than field order elements 
