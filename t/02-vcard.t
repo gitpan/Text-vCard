@@ -4,7 +4,7 @@ use strict;
 
 use lib qw( ./blib/lib ../blib/lib );
 
-use Test::More qw(no_plan);
+use Test::More tests => 28;
 use Data::Dumper;
 # Check we can load module
 BEGIN { use_ok( 'Text::vCard' ); }
@@ -120,4 +120,28 @@ is($vcard->email(),undef,'autogen methods - undef for no email as expected');
 is($vcard->email('n.e@body.com'),'n.e@body.com','autogen methods - new value set');
 
 is($vcard->birthday('new bd'),'new bd','autogen added with alias');
+
+######
+# get get_group()
+######
+my $adgroup = Text::vCard::Addressbook->new({ 'source_file' => 't/apple_version3.vcf'});
+
+my $adgr_vcards = $adgroup->vcards();
+
+my $adgr_vcard = $adgr_vcards->[0];
+
+my $item1_nodes = $adgr_vcard->get_group('item1');
+is(scalar(@{$item1_nodes}),2,'get_group("item1") - got 2 nodes as arrayref - expected');
+
+my @item1_nodes_array = $adgr_vcard->get_group('item1');
+is(scalar(@item1_nodes_array),2,'get_group("item1") - got 2 nodes as array - expected');
+
+my $item2_abadr = $adgr_vcard->get_group('item2','X-AbADR');
+is($item2_abadr->[0]->value(),'uk','get_group("item2","X-AbADR") - got value from node');
+
+eval {
+	$adgr_vcard->get_group();
+};
+
+like($@, qr/No group name supplied/,'get_group - carp if no group name supplied');
 

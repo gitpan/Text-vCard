@@ -1,6 +1,7 @@
+# http://module-build.sourceforge.net/META-spec.html
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         Text-vCard
-version:      1.92
+version:      1.93
 version_from: 
 installdirs:  site
 requires:
@@ -9,4 +10,4 @@ requires:
     Text::vFile::asData:           0.02
 
 distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.12
+generated_by: ExtUtils::MakeMaker version 6.25

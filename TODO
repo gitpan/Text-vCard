@@ -2,8 +2,6 @@ Addressbook:
 
 find()
 	- get vcards matching specific criteria
-vCard:
-	- add get_group() or similar method
 
 overall:
 	- better doc examples

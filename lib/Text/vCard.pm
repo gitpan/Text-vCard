@@ -10,7 +10,7 @@ use Text::vCard::Node;
 # See this module for your basic parser functions
 use base qw(Text::vFile::asData);
 use vars qw ($VERSION %lookup %node_aliases @simple);
-$VERSION = '1.92';
+$VERSION = '1.93';
 
 # If the node's data does not break down use this
 my @default_field = qw(value);
@@ -120,6 +120,9 @@ sub new {
 
 	bless($self,$class);
 
+	my %nodes;
+	$self->{nodes} = \%nodes;
+	
 	if(defined $conf->{'asData_node'}) {
 		# Have a vcard data node being passed in
 		while(my ($node_type,$data) = each %{$conf->{'asData_node'}}) {
@@ -285,6 +288,56 @@ or all lowercase method names.
   $addresses->[0]->add_types('home');
   $addresses->[0]->remove_types('work');
 
+=head2 get_group()
+
+  my $group_name = 'item1';
+  my $node_type = 'X-ABLABEL';
+  my $of_group = $vcard->get_group($group_name,$node_type);
+  foreach my $label (@{$of_group}) {
+	print $label->value();
+  }
+
+This method takes one or two arguments. The group name
+(accessable on any node object by using $node->group() - not
+all nodes will have a group, indeed most vcards do not seem
+to use it) and optionally the types of node you with to 
+have returned.
+
+Either an array or array reference is returned depending
+on the calling context, if there are no matches it will
+be empty.
+
+=cut
+
+sub get_group {
+	my ($self,$group_name,$node_type) = @_;
+	my @to_return;
+
+	carp "No group name supplied" unless defined $group_name and $group_name ne '';
+	
+	$group_name = lc($group_name);
+	
+	if(defined $node_type && $node_type ne '') {
+		# After a specific node type
+		my $nodes = $self->get($node_type);
+		foreach my $node (@{$nodes}) {
+			push(@to_return, $node) if $node->group() eq $group_name;
+		}
+	} else {
+		# We want everything from that group
+		foreach my $node_loop (keys %{$self->{nodes}}) {
+			# Loop through each type
+			my $nodes = $self->get($node_loop);
+			foreach my $node (@{$nodes}) {
+				if($node->group()) {
+					push(@to_return, $node) if $node->group() eq $group_name;
+				}
+			}
+		}
+	}
+	return wantarray ? @to_return : \@to_return;
+}
+
 =head1 BINARY METHODS
 
 These methods allow access to what are potentially
@@ -347,7 +400,7 @@ sub get_of_type {
 	# See if there is an alias for it
 	$node_type = uc($node_aliases{$node_type}) if defined $node_aliases{$node_type};
 
-	return undef unless defined $self->{$node_type};
+	return undef unless defined $self->{nodes}->{$node_type};
 
 	if($types) {
 		# After specific types
@@ -360,7 +413,7 @@ sub get_of_type {
 			#	print "T: $types\n";
 		}
 		my @to_return;
-		foreach my $element (@{$self->{$node_type}}) {
+		foreach my $element (@{$self->{nodes}->{$node_type}}) {
 			my $check = 1; # assum ok for now
 			foreach my $type (@of_type) {
 				# set it as bad if we don't match				
@@ -384,7 +437,7 @@ sub get_of_type {
 	
 	} else {
 		# Return them all
-		return wantarray ? @{$self->{$node_type}} : $self->{$node_type};	
+		return wantarray ? @{$self->{nodes}->{$node_type}} : $self->{nodes}->{$node_type};	
 	}	
 }
 
@@ -415,10 +468,10 @@ sub _add_node {
 		# No defined fields - use just the 'value' one
 		$field_list = \@default_field;
 	}
-	unless(defined $self->{$node_type}) {
+	unless(defined $self->{nodes}->{$node_type}) {
 		# create space to hold list of node objects
 		my @node_list_space;
-		$self->{$node_type} = \@node_list_space;
+		$self->{nodes}->{$node_type} = \@node_list_space;
 	}	
 	my $last_node;
 	foreach my $node_data (@{$conf->{data}}) {
@@ -429,7 +482,7 @@ sub _add_node {
 			group => $conf->{group} || '',
 		});
 
-		push(@{$self->{$node_type}}, $node_obj);
+		push(@{$self->{nodes}->{$node_type}}, $node_obj);
 		
 		# store the last node so we can return it.
 		$last_node = $node_obj;

@@ -1,5 +1,11 @@
 Revision history for Perl extension Text::vCard.
 
+1.93 Mon 31st Jan 2005
+	- Restructured object so all nodes are stored in a hashref
+	  $self->{nodes} so I can get get_group to work, all other
+	  methods updated to reflect this.
+	- added get_group() to vcard
+
 1.92	- Added group() to Node and extract that info
 	  from the vcard if it is there.
 
