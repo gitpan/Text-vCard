@@ -10,7 +10,7 @@ use Text::vCard::Node;
 # See this module for your basic parser functions
 use base qw(Text::vFile::asData);
 use vars qw ($VERSION %lookup %node_aliases @simple);
-$VERSION = '1.8';
+$VERSION = '1.9';
 
 # If the node's data does not break down use this
 my @default_field = qw(value);
@@ -258,9 +258,9 @@ or all lowercase method names.
   N             name            'family','given','middle','prefixes','suffixes'
   ADR           addresses       'po_box','extended','street','city','region','post_code','country'
   GEO                           'lat','long'
-  ORG                           'name','unit'
   TELS          phones
   LABELS
+  ORG                           'name','unit' (unit is a special case and will return an array reference)
 
   my $addresses = $vcard->get({ 'node_type' => 'addresses' });
   foreach my $address (@{$addresses}) {
@@ -426,12 +426,6 @@ sub _add_node {
 	}
 	return $last_node;
 }
-
-=head2 import()
-
-  This is called to create methods at run time. If you want to 
-load T:vC at runtime using 'require T:vC' would also have to call 
-'import' by hand.
 
 =head1 AUTHOR
 

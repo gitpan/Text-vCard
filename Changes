@@ -1,5 +1,13 @@
 Revision history for Perl extension Text::vCard.
 
+1.9 
+	- removed import() from docs as not used now
+	- changed Node so excepts data with less than field order elements 
+	e.g. N, accepts 'Jon;Smith', As well as 'Jon;Smith;Dr;' this means
+	we work better according to the RFC
+	- ORGs' 'unit' method requires and returns an array ref as it is
+	unlimited in the number of elements it has
+
 1.8 Fri 15th Oct 2004
 	- Applied patch from Aaron Cope for version stuff, can
 	  now access it as lowercase version().

@@ -5,7 +5,7 @@ use Carp;
 use Data::Dumper;
 
 use vars qw ( $AUTOLOAD $VERSION );
-$VERSION = '1.8';
+$VERSION = '1.9';
 
 =head1 NAME
 
@@ -106,16 +106,42 @@ sub new {
 			
 			# the -1 on split is so ;; values create elements in the array	
 			my @elements = split(/(?<!\\);/, $conf->{'data'}->{'value'},-1);
-			if(scalar(@elements) == scalar(@{$self->{'field_order'}})) {
+			if(defined $self->{node_type} && $self->{node_type} eq 'ORG') {
+				# cover ORG where unit is a list
+				$self->{'name'} = shift(@elements);
+				$self->{'unit'} = \@elements if scalar(@elements) > 0;
+				
+			} elsif (scalar(@elements) <= scalar(@{$self->{'field_order'}})) {
 				# set the field values as the data e.g. $self->{street} = 'The street'
 				@{$self}{@{$self->{'field_order'}}} = @elements;
+				
 			} else {
-					print Dumper(@elements);
-				carp 'Data value had ' . scalar(@elements) . ' elements expecting ' . scalar(@{$self->{'field_order'}});
+				carp 'Data value had ' . scalar(@elements) . 
+					' elements expecting ' . scalar(@{$self->{'field_order'}}) . 
+						' or less';
 			}
 		}
 	}
 	return $self;
+}
+
+=head2 unit()
+
+  my @units = @{$org_node->unit()};
+  $org_node->unit(['Division','Department','Sub-department']);
+
+As ORG allows unlimited numbers of 'units' as well as and organisation
+'name', this method is a specific case for accessing those values, they
+are always returned as an array reference, and should always be set
+as an array reference. 
+
+=cut
+
+sub unit {
+	my ($self,$val) = @_;
+	$self->{'unit'} = $val if $val && ref($val) eq 'ARRAY';
+	return $self->{'unit'} if defined $self->{'unit'};
+	return undef;
 }
 
 =head2 types()

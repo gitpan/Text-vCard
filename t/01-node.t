@@ -55,18 +55,30 @@ eval {
 };
 like($@,qr/fields is not an array ref/,'new() carps when fields is not an array ref');
 
-my %too_few_value_data = (
-	'value' => 'Street;Work city;London;Work PostCode;CountryName',
+my %too_many_value_data = (
+	'value' => 'asd;Street;Work city;London;Work PostCode;CountryName;more;values',
 );
 eval {
 	my $duff =  Text::vCard::Node->new({
 		fields => $fields,
-		data => \%too_few_value_data,
+		data => \%too_many_value_data,
 	});
 };
-like($@,qr/Data value had 5 elements expecting 7/,'new() carp on wrong number of elements in value comp to fields');
+like($@,qr/Data value had 8 elements expecting 7 or less/,'new() carp on wrong number of elements in value comp to fields');
+
+my %a_few_data_points = (
+	'value' => 'x;s;Street;City',
+);
 
 # Working nodes
+my $nod_few_fields = Text::vCard::Node->new({
+                fields => $fields,
+                data => \%a_few_data_points,
+});
+is($nod_few_fields->street(),'Street','new() - less data than fields, field set ok');
+is($nod_few_fields->post_code(),undef,'new() - less data, empty field returns undef');
+$nod_few_fields->post_code('postcode');
+is($nod_few_fields->post_code(),'postcode','new() - less data, set empty field');
 
 # Create without a node_type - should be fine
 my $no =  Text::vCard::Node->new({
@@ -89,6 +101,32 @@ my $node = Text::vCard::Node->new({
 
 is($no->street(),$node->street(),'new() without node_type still works ok');
 
+###
+# ORG
+###
+my %orgdata = (
+	'value' => 'name;unit;extra',
+);
+my $org = Text::vCard::Node->new({
+	node_type => 'ORG',
+	fields => ['name','unit'],
+	data => \%orgdata,
+});
+is(scalar(@{$org->unit()}),2,'org - Got two elements back from unit');
+my @new_org = qw(a b c);
+is(scalar(@{$org->unit(\@new_org)}),3,'org - Got the elements back from setting unit');
+
+is(scalar(@{$org->unit('foo')}),3,'org - Got the elements back from trying to set unit with string');
+
+my %single_org = (
+	'value' => 'just_name',
+);
+my $org_name = Text::vCard::Node->new({
+	node_type => 'ORG',
+	fields => ['name','unit'],
+	data => \%single_org,
+});
+is($org_name->unit(),undef,'org - copes with unit being empty');
 
 
 #####
@@ -161,4 +199,6 @@ is($node->export_data(),$export,'export_data() - Node returns expected data, wit
 
 
 # Test non-existant methods
+
+
 
