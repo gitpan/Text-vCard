@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::vCard.
 
+0.9  Sat July  07 10:19:00 2003
+	- Fixed major doc error!
+
 0.8  Sat May  17 21:19:00 2003
 	- Added ability to specify types and tests
 	- Altered add_type() and remove_type() to accept array ref as well

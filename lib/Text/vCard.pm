@@ -12,7 +12,7 @@ use Text::vCard::Part::Geo;
 # See this module for your basic parser functions
 use base qw(Text::vFile::Base);
 use vars qw ( $AUTOLOAD $VERSION );
-$VERSION = '0.8';
+$VERSION = '0.9';
 
 # Tell vFile that BEGIN:VCARD line creates one of these objects
 $Text::vFile::classMap{'VCARD'}=__PACKAGE__;
@@ -21,33 +21,53 @@ $Text::vFile::classMap{'VCARD'}=__PACKAGE__;
 
 Text::vCard - a package to parse, edit and create vCards (RFC 2426) 
 
-=head1 IMPORTANT
-
-The API is currently subject to change, so don't rely on it being
-the same in the next version! Some documented functionality is still
-under development as well, basically have a look if your interested
-but give me a few weeks to get a finished version out!
-
 =head1 SYNOPSIS
 
   use Text::vCard;
-  my $loader = Text::vCard->loader( source => "xmas_card_list.vcf" );
+  my $cards = Text::vCard->load( "foo.vCard", "blort.vCard", "whee.vCard" );
 
-  while (my $vcard = $loader->next) {
-    $vcard->....;
+  foreach my $vcard (@{$cards}) {
+	print "Got card for " . $vcard->fn() . "\n";
   }
-
-or even sexier
-
-  while (my $vcard = <$loader> ) {
-    $vcard->...;
-  }
-
-See Text::vFile for more options, such as parsing a string.
 
 =head1 DESCRIPTION
 
-Still under active development.
+This package provides an API to reading / editing and creating
+vCards. A vCard is an electronic business card. This package has
+been developed based on rfc2426 which is version 3, we are working
+to activly support version 2.1 as well.
+
+You will find that many applications (Apple Address book, MS Outlook,
+Evolution etc) can export and import vCards. 
+
+=TODO
+
+- Write out vCards (will be part of Text::vFile).
+- Support 'types' on version 2.1 of vCards.
+- methods for creating elements.
+
+=head1 READING IN VCARDS
+
+  use Text::vCard;
+  my $cards = Text::vCard->load( "foo.vCard", "blort.vCard", "whee.vCard" );
+
+  foreach my $vcard (@{$cards}) {
+	$vcard->...;
+  }
+
+# OR
+
+  my $reader = Text::vCard->new( source_file => "foo.vCard" );
+  while ( my $vcard = $reader->next ) {
+	$vcard->...;
+  }
+
+# OR
+
+  my $reader = Text::vCard->new( source_text => $vcard_data );
+  while ( my $vcard = <$reader> ) {
+	$vcard->...;
+  }
 
 =head1 GENERAL METHODS
 
@@ -162,7 +182,8 @@ The following list of methods can be accessed as follows:
 
  my $value = $vcard->method();
 
-Undef will be returned if a value does not exists.
+Undef will be returned if a value does not exists,
+otherwise the value is a scalar.
 
 and can set a new value as follows:
 
