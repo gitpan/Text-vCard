@@ -1,5 +1,10 @@
 Revision history for Perl extension Text::vCard.
 
+1.6 Wed 13th Oct 2004
+	- removed import() and made anonsub again
+	- removed version() as was conflicting with $VERSION, 
+	  info can be accessed through other methods in anycase
+
 1.5 Wed  Oct 6th 2004
 	- Change to support asData change for 'type=home;type=pref'
 	- Change to support escaped ; (\;) in data - 'note' now works

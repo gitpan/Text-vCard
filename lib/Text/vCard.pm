@@ -37,10 +37,8 @@ my @default_field = qw(value);
 # Now we want lowercase as well
 map { push(@simple,lc($_)) } @simple;
 
-&import;
-
 # Generate the methods
-sub import {
+{
 	no strict 'refs';
 	no warnings;
 	for my $node (@simple) { 
@@ -242,8 +240,7 @@ undef is returned if the node does not exist.
   REV 
   SORT-STRING 
   UID
-  URL
-  VERSION 
+  URL 
   CLASS
   EMAIL
   NICKNAME
@@ -259,6 +256,7 @@ undef is returned if the node does not exist.
   ORG                           'name','unit'
   TELS          phones
   LABELS
+  VERSION (special case as conflicts with $VERSION)
 
   my $addresses = $vcard->get({ 'node_type' => 'addresses' });
   foreach my $address (@{$addresses}) {
