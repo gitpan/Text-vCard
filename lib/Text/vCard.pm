@@ -12,7 +12,7 @@ use Text::vCard::Part::Geo;
 # See this module for your basic parser functions
 use base qw(Text::vFile::Base);
 use vars qw ( $AUTOLOAD $VERSION );
-$VERSION = '0.7';
+$VERSION = '0.8';
 
 # Tell vFile that BEGIN:VCARD line creates one of these objects
 $Text::vFile::classMap{'VCARD'}=__PACKAGE__;
@@ -43,7 +43,7 @@ or even sexier
     $vcard->...;
   }
 
-See Text::vCard for more options, such as parsing a string.
+See Text::vFile for more options, such as parsing a string.
 
 =head1 DESCRIPTION
 
@@ -80,10 +80,22 @@ sub name {
 
 =head1 LIST METHODS
 
-Accessing lists of eliments
+Accessing lists of elements, if no elements
+exist then undef is returned.
 
   my @list = $vcard->method();
   my $list_array_ref = $vcard->method();
+
+Return all of a specific element.
+
+  my @list_of_type = $vcard->method('type');
+  my @types = qw(home work pref);
+  my @list_of_type = $vcard->method(\@types);
+
+Supplied with a scalar or an array ref the methods
+return a list of specific elements of a type. If any
+of the elements is the prefered element it will be
+returned as the first element of the list.
   
   foreach my $object (@list) {
   	$object->value();
@@ -93,7 +105,8 @@ Accessing lists of eliments
   	$object->remove_type('work');
   }
 
-TODO: specify type(s) if required, adding new eliments
+Go through each object, then call what ever
+methods you want.
 
 =head2 addresses()
 
@@ -103,11 +116,8 @@ Text::vCard::Part::Address objects.
 =cut
 
 sub addresses {
-	my $self = shift;
-	
-	return undef unless defined $self->{ADR};
-	
-	return wantarray ? @{$self->{ADR}} : $self->{ADR};	
+	my ($self,$types) = @_;
+	return $self->_get_of_type('ADR',$types);
 }
 
 =head2 tels()
@@ -118,11 +128,8 @@ Text::vCard::Part::Basic objects.
 =cut
 
 sub tels {
-	my $self = shift;
-	
-	return undef unless defined $self->{TEL};
-	
-	return wantarray ? @{$self->{TEL}} : $self->{TEL};	
+	my ($self,$types) = @_;
+	return $self->_get_of_type('TEL',$types);
 }
 
 =head2 lables()
@@ -133,11 +140,8 @@ Text::vCard::Part::Basic objects.
 =cut
 
 sub lables {
-	my $self = shift;
-	
-	return undef unless defined $self->{LABLE};
-	
-	return wantarray ? @{$self->{LABLE}} : $self->{LABLE};	
+	my ($self,$types) = @_;
+	return $self->_get_of_type('LABLE',$types);
 }
 
 =head2 emails()
@@ -148,11 +152,8 @@ Text::vCard::Part::Basic objects.
 =cut
 
 sub emails {
-	my $self = shift;
-	
-	return undef unless defined $self->{EMAIL};
-	
-	return wantarray ? @{$self->{EMAIL}} : $self->{EMAIL};	
+	my ($self,$types) = @_;
+	return $self->_get_of_type('EMAIL',$types);
 }
 
 =head1 SINGLETYPE METHODS
@@ -229,10 +230,9 @@ format used to create the for the card.
 This method retrieves or sets the access classification for
 the vCard object
 
+=head1 TYPED SINGLE ELEMENTS METHODS
 
-=head1 TYPED SINGLE ELIMENTS METHODS
-
-Accessing lists of eliments
+Accessing lists of elements
 
   my $object = $vcard->method();
   
@@ -308,7 +308,18 @@ API still to be finalised.
 
 =head2 logo()
 
+#=head1 ADDING ELEMENTS
+#my $address = $vcard->address_new({
+#	'street' => 'The Street',
+#});
 =cut
+
+#sub address_new {
+#	my($self,$conf) = @_;
+#	$conf->{'new_object'}
+#	return Text::vCard::Part::Address->new($conf); 	
+#}
+
 
 sub DESTROY {
 }
@@ -467,6 +478,47 @@ sub load_LOGO {
 	return Text::vCard::Part::Binary->new($item); 
 }
 
+# Used to get the right elements
+sub _get_of_type {
+	my ($self, $element_type, $types) = @_;
+	
+	return undef unless defined $self->{$element_type};
+
+	if($types) {
+		# After specific types
+		my @of_type;
+		if(ref($types) eq 'ARRAY') {
+			@of_type = @{$types};
+		} else {
+			push(@of_type, $types);
+		}
+		my @to_return;
+		foreach my $element (@{$self->{$element_type}}) {
+			my $check = 1; # assum ok for now
+			foreach my $type (@of_type) {
+				# set it as bad if we don't match
+				$check = 0 unless $element->is_type($type);
+			}
+			if($check == 1) {
+				push(@to_return, $element);
+			}
+		}
+		
+		return undef unless scalar(@to_return);
+		
+		# Make prefered value first
+		@to_return = sort {
+			$b->is_pref() <=> $a->is_pref()
+		} @to_return;
+
+		return wantarray ? @to_return : \@to_return;	
+	
+	} else {
+		# Return them all
+		return wantarray ? @{$self->{$element_type}} : $self->{$element_type};	
+	}	
+}
+
 =head1 AUTHOR
 
 Leo Lapworth, LLAP@cuckoo.org
@@ -480,11 +532,12 @@ it and/or modify it under the same terms as Perl itself.
 =head1 ACKNOWLEDGEMENTS
 
 Jay J. Lawrence for being a fantastic person to bounce ideas
-of and for creating Text::vFile from our discussions.
+off and for creating Text::vFile from our discussions.
 
 =head1 SEE ALSO
 
-Text::vFile::Base, Text::vFile, Text::vCard::Part::Address, Text::vCard::Part::Name.
+Text::vFile::Base, Text::vFile, Text::vCard::Part::Address, Text::vCard::Part::Name,
+Text::vCard::Part::Basic, Text::vCard::Part::Binary, Text::vCard::Part::Geo
 
 =cut
 

@@ -4,7 +4,7 @@ use strict;
 
 use lib qw( ./blib/lib ../blib/lib );
 
-use Test::More tests => 28;
+use Test::More tests => 32;
 use Data::Dumper;
 # Check we can load module
 BEGIN { use_ok( 'Text::vCard' ); }
@@ -20,7 +20,15 @@ my $new_name = 'New Test Full Name';
 is($vcard->fn($new_name),$new_name,'Setting new full name');
 is($vcard->fn(),$new_name,'New full name matches');
 
+is($vcard->addresses('work'),undef,"No work addresses as expected");
+my @home_addr = $vcard->addresses('home');
+is(scalar(@home_addr),2,"One address of type home in an array");
+
+ok($home_addr[0]->is_type('pref'),'Returned the prefered address first');
+
 my $addresses = $vcard->addresses();
+
+is(ref($addresses),'ARRAY','Returned array ref as wanted');
 
 my $address = $addresses->[0];
 

@@ -3,7 +3,7 @@ package Text::vCard::Part::Address;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = '0.7';
+$VERSION = '0.8';
 
 use base qw(Text::vCard::Part);
 
