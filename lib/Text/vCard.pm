@@ -1,6 +1,7 @@
 package Text::vCard;
 
 use Carp;
+use strict;
 
 use Text::vCard::Part::Name;
 use Text::vCard::Part::Address;
@@ -9,7 +10,8 @@ use Text::vCard::Part::Geo;
 
 # See this module for your basic parser functions
 use base qw(Text::vFile::Base);
-use vars qw ( $AUTOLOAD );
+use vars qw ( $AUTOLOAD $VERSION );
+$VERSION = '0.6';
 
 # Tell vFile that BEGIN:VCARD line creates one of these objects
 $Text::vFile::classMap{'VCARD'}=__PACKAGE__;
@@ -27,18 +29,18 @@ but give me a few weeks to get a finished version out!
 
 =head1 SYNOPSIS
 
-    use Text::vCard;
-    my $loader = Text::vCard->loader( source => "xmas_card_list.vcf" );
+  use Text::vCard;
+  my $loader = Text::vCard->loader( source => "xmas_card_list.vcf" );
 
-    while (my $vcard = $loader->next) {
-        $vcard->....;
-    }
+  while (my $vcard = $loader->next) {
+    $vcard->....;
+  }
 
-    # or even sexier
-    
-    while (my $vcard = <$loader> ) {
-        $vcard->...;
-    }
+# or even sexier
+
+  while (my $vcard = <$loader> ) {
+    $vcard->...;
+  }
 
 =head1 DESCRIPTION
 
@@ -48,8 +50,8 @@ Still under active development.
 
 =head2 addresses()
 
-	my @addresses = $vcard->addresses();
-	my $address_array_ref = $vcard->addresses();
+  my @addresses = $vcard->addresses();
+  my $address_array_ref = $vcard->addresses();
 	
 This method returns an array or array ref containing 
 Text::vCard::Part::Address objects.
@@ -86,121 +88,102 @@ sub name {
 
 =head1 SINGLETYPE METHODS
 
+The following list of methods can be accessed as follows:
+
+ my $value = $vcard->method();
+
+Undef will be returned if a value does not exists.
+
+and can set a new value as follows:
+
+ $vcard->method($value);
+
 =head2 fn()
 
-  my $full_name = $vcard->fn();
-  $vcard->fn($full_name);
-  
 This method retrieves or sets the full name of the person
 associated with the card
 
 =head2 bday()
 
-  my $birthday = $vcard->bday();
-  $vcard->bday($birthday);
-  
 This method retrieves or sets the birthday of the person
-associated with the card, undef is returned if this value
-is not available.
+associated with the card.
 
 =head2 mailer()
 
-  my $mailer = $vcard->mailer();
-  $vcard->mailer($mailer);
-  
 This method retrieves or sets the type of email software
-the person associated with the card uses, undef is returned 
-if this value is not available.
+the person associated with the card uses.
 
 =head2 title()
 
-  my $title = $vcard->title();
-  $vcard->title($title);
-  
 This method retrieves or sets the title of the person
-associated with the card, undef is returned if this value
-is not available.
+associated with the card.
 
 =head2 role()
 
-  my $role = $vcard->role();
-  $vcard->role($role);
-  
 This method retrieves or sets the role of the person
 associated with the card based on the X.520 Business Category
-explanatory attribute. undef is returned if this value
-is not available.
+explanatory attribute
 
 =head2 note()
 
-  my $note = $vcard->note();
-  $vcard->note($note);
-  
 This method retrieves or sets a note for the person
-associated with the card, undef is returned if this value
-is not available.
+associated with the card
 
 =head2 prodid()
 
-  my $prodid = $vcard->prodid();
-  $vcard->prodid($prodid);
-  
 This method retrieves or sets the product identifier that
-created the vCard, undef is returned if this value
-is not available.
+created the vCard
 
 =head2 rev()
 
-  my $rev = $vcard->rev();
-  $vcard->rev($rev);
-  
 This method retrieves or sets the revision (e.g. verson)
 of the vcard, of the format date-time or just date. 
-undef is returned if this value is not available.
 
 =head2 sort-string()
 
-  my $sort-string = $vcard->sort-string();
-  $vcard->sort-string($sort-string);
-  
 This method retrieves or sets the family name or given name 
 text to be used for national-language-specific sorting of 
 the fn and name types for the person associated with the card. 
-undef is returned if this value is not available.
-
 
 =head2 url()
 
-  my $url = $vcard->url();
-  $vcard->url($url);
-  
 This method retrieves or sets a single url associated with 
-the card, undef is returned if this value
-is not available.
+the card.
 
 =head2 version()
 
-  my $version = $vcard->version();
-  $vcard->version($version);
-  
 This method retrieves or sets the version of the vCard
 format used to create the for the card.
 
 =head2 class()
 
-  my $class = $vcard->class();
-  $vcard->class($class);
-  
 This method retrieves or sets the access classification for
-the vCard object, undef is returned if this value
-is not available.
+the vCard object
 
+=head1 MULTIPLETEXT METHODS
+
+  my $value = $vcard->method();
+  $vcard->method($value);
+  $vcard->method(\@value);
+
+The following methods will return a string, containing a
+list of values which are comma seperated. They can be altered
+by passing in a scalar or an array refernce (this is joined
+with commas internally and set as the new value).
+
+=head2 nickname()
+
+Nicknames associated with the person.
+
+=head2 org()
+
+Organisations associated with the person.
+
+=head2 categories()
+
+Categories associated with the person.
 
 =head1 TODO
-
-#        'NICKNAME'    => 'multipleText',
-#        'ORG'         => 'multipleText',
-#        'CATEGORIES'  => 'multipleText',
 
 AGENT
 
@@ -229,15 +212,18 @@ sub AUTOLOAD {
 	my $varHandler = varHandler();
 	
 	if(defined $varHandler->{$name}) {
-		if($varHandler->{$name} eq 'singleText') {
+		if($varHandler->{$name} eq 'singleText' or $varHandler->{$name} eq 'multipleText' ) {
 			if($_[1]) {
-				$_[0]->{$name}->{value} = $_[1];	
+				if(ref($_[1]) eq 'ARRAY') {
+					$_[0]->{$name}->{value} = join(',', @{$_[1]});
+				} else {
+					$_[0]->{$name}->{value} = $_[1];
+				}
 			}
 			return $_[0]->{$name}->{value} if defined $_[0]->{$name}->{value};
 			return undef;
 		} elsif($varHandler->{$name} eq 'singleBinary') {
-			# photo or something like that
-########## MORE STUFF			
+			# photo etc..
 		} 
 	} else {
 		croak "Unknown method $name";
@@ -252,9 +238,6 @@ sub varHandler {
 # Handled by a 'part' object
 #        'N'           => 'N',
 #        'ADR'         => 'ADR',
-#        'NICKNAME'    => 'multipleText',
-#        'ORG'         => 'multipleText',
-#        'CATEGORIES'  => 'multipleText',
 #        'GEO'         => 'multipleText',
 
 
@@ -271,6 +254,9 @@ sub varHandler {
         'URL'         => 'singleText',
         'VERSION'     => 'singleText',
         'CLASS'       => 'singleText',
+        'NICKNAME'    => 'multipleText',
+        'ORG'         => 'multipleText',
+        'CATEGORIES'  => 'multipleText',
         'KEY'         => 'singleBinary',
         'PHOTO'       => 'singleBinary',
         'SOUND'       => 'singleBinary',

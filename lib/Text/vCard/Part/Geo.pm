@@ -2,6 +2,9 @@ package Text::vCard::Part::Geo;
 
 use strict;
 
+use vars qw($VERSION);
+$VERSION = '0.6';
+
 use base qw(Text::vCard::Part);
 
 sub config {

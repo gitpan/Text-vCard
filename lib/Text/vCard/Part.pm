@@ -2,7 +2,17 @@ package Text::vCard::Part;
 
 use strict;
 use Carp;
-use vars qw ( $AUTOLOAD );
+
+use vars qw ( $AUTOLOAD $VERSION );
+$VERSION = '0.6';
+
+
+# This ain't working - anyone know why ?
+use overload  
+	q{""} => sub { $_[0]->{'value'} },
+	fallback => 1,
+;
+
 
 =head1 NAME
 
