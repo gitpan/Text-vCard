@@ -10,7 +10,7 @@ use Text::vCard::Node;
 # See this module for your basic parser functions
 use base qw(Text::vFile::asData);
 use vars qw ($VERSION %lookup %node_aliases @simple);
-$VERSION = '1.3';
+$VERSION = '1.4';
 
 %lookup = (
 	'ADR' => ['po_box','extended','street','city','region','post_code','country'],
@@ -33,8 +33,10 @@ $VERSION = '1.3';
 # Now we want lowercase as well
 map { push(@simple,lc($_)) } @simple;
 
+&_import;
+
 # Generate the methods
-{
+sub _import {
 	no strict 'refs';
 	no warnings;
 	for my $node (@simple) { 

@@ -10,7 +10,7 @@ use Text::vCard;
 # See this module for your basic parser functions
 use base qw(Text::vFile::asData);
 use vars qw ($VERSION);
-$VERSION = '1.3';
+$VERSION = '1.4';
 
 =head1 NAME
 
@@ -59,7 +59,7 @@ sub load {
 	
 	foreach my $file (@{$files}) {
 		croak "Unable to read file $file\n" unless -r $file;
-		$self->_process_text(read_file($file));
+		$self->_process_text(scalar read_file($file));
 	}
 
 	return $self;
