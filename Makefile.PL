@@ -1,8 +1,8 @@
 use ExtUtils::MakeMaker;
 
-my $VERSION = '1.1';
+my $VERSION = '1.2';
 
-my $ABSTRACT = "Module for parsing and creating vCard (RFC 2426) address";
+my $ABSTRACT = "Module for parsing and creating vCards (RFC 2426) address";
 
 WriteMakefile(
  	'NAME'		=> 'Text::vCard',

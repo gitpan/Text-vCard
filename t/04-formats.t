@@ -6,9 +6,11 @@ use lib qw( ./blib/lib ../blib/lib );
 
 use Test::More qw(no_plan);
 # Check we can load module
+use Data::Dumper;
 BEGIN { use_ok( 'Text::vCard::Addressbook' ); }
 
-my @card_types = qw(evolution.vcf apple_2.1_unicode.vcf);
+my @card_types = qw(evolution.vcf apple_2.1_unicode.vcf apple_version3.vcf);
+#my @card_types = qw(apple_version3.vcf);
 
 foreach my $card_type (@card_types) {
 	ok($card_type,"Running from $card_type");
@@ -19,7 +21,6 @@ foreach my $card_type (@card_types) {
 	is(scalar(@{$vcards}),1,"$card_type has 1 vcards as expected");
 	my $vcard = $vcards->[0];
 	is($vcard->get('fn')->[0]->value(),'T-firstname T-surname',"$card_type has fn data correct");
-
 	my $t = $vcard->get({
 		'element_type' => 'tel',
 		'types' => 'home',

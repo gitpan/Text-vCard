@@ -9,8 +9,8 @@ use Text::vCard::Node;
 
 # See this module for your basic parser functions
 use base qw(Text::vFile::asData);
-use vars qw ( $AUTOLOAD $VERSION %lookup %node_aliases);
-$VERSION = '1.1';
+use vars qw ($VERSION %lookup %node_aliases @simple);
+$VERSION = '1.2';
 
 %lookup = (
 	'ADR' => ['po_box','extended','street','city','region','post_code','country'],
@@ -27,6 +27,40 @@ $VERSION = '1.1';
 	'ADDRESSES'	=> 'ADR',
 	'NAME'		=> 'N',
 );
+
+# Generate all our simple methods
+@simple = qw(FN BDAY MAILER TZ TITLE ROLE NOTE PRODID REV SORT-STRING UID URL VERSION CLASS FULLNAME BIRTHDAY TZ NAME EMAIL NICKNAME PHOTO);
+# Now we want lowercase as well
+map { push(@simple,lc($_)) } @simple;
+
+# Generate the methods
+{
+	no strict 'refs';
+	no warnings;
+	for my $node (@simple) { 
+		*$node = sub { 
+			my ($self,$value) = @_; 
+			# See if we have it already
+			my $nodes = $self->get($node);
+			if(!defined $nodes && $value) {
+				# Add it as a node if not exists and there is a value
+				$self->add_node({
+					'node_type' => $node,
+				});
+				# Get it out again
+				$nodes = $self->get($node);
+			}
+
+			if(scalar($nodes) && $value) {
+				# Set it
+				$nodes->[0]->value($value);
+			}
+			
+			return $nodes->[0]->value() if scalar($nodes);
+			return undef;
+		}
+	}
+}
 
 my @default_field = qw(value);
 
@@ -81,6 +115,11 @@ sub new {
 	if(defined $conf->{'asData_node'}) {
 		# Have a vcard data node being passed in
 		while(my ($node_type,$data) = each %{$conf->{'asData_node'}}) {
+			if($node_type =~ /\./) {
+				# Version 3.0 supports group types, we do not
+				# so remove everything before '.'
+				$node_type =~ s/.+\.(.*)/$1/;
+			}
 			# Deal with each type (ADR, FN, TEL etc)
 			$self->_add_node({
 				'node_type' => $node_type,
@@ -159,10 +198,8 @@ sub get {
 	}
 }
 
+=head2 nodes
 
-=head2 simple nodes
-
-########## CHECK
   my $fullname = ($vcard->get({ 'element_type' => 'fullname' }))[0];
   
   # get the value
@@ -174,36 +211,47 @@ sub get {
 According to the RFC the following 'simple' nodes should only have one element, this is
 not enforced by this module, so for example you can have multiple URL's if you wish.
 
-vCard Spec: 'simple'	Alias
---------------------    --------
-FN 			fullname
-BDAY 			birthday
-MAILER
-TZ 			timezone
-TITLE 
-ROLE 
-NOTE 
-PRODID 
-REV 
-SORT-STRING 
-UID
-URL
-VERSION 
-CLASS
+=head2 simple nodes
+
+For simple nodes, you can also access the first node in the following way:
+
+  my $fn = $vcard->fullname();
+  # or setting
+  $vcard->fullname('new name');
+
+The node will be automatically created if it does not exist and you supplied a value.
+undef is returned if the node does not exist.
+
+  vCard Spec: 'simple'    Alias
+  --------------------    --------
+  FN                      fullname
+  BDAY                    birthday
+  MAILER
+  TZ                      timezone
+  TITLE 
+  ROLE 
+  NOTE 
+  PRODID 
+  REV 
+  SORT-STRING 
+  UID
+  URL
+  VERSION 
+  CLASS
+  EMAIL
+  NICKNAME
+  PHOTO
 
 =head2 more complex vcard nodes
 
-vCard Spec	Alias		Methods on object
------------	----------	-----------------
-N		name		'family','given','middle','prefixes','suffixes'
-ADR		addresses	'po_box','extended','street','city','region','post_code','country'
-NICKNAME
-PHOTO
-GEO				'lat','long'
-ORG				'name','unit'
-TELS		phones
-LABELS
-EMAILS
+  vCard Spec    Alias           Methods on object
+  ----------    ----------      -----------------
+  N             name            'family','given','middle','prefixes','suffixes'
+  ADR           addresses       'po_box','extended','street','city','region','post_code','country'
+  GEO                           'lat','long'
+  ORG                           'name','unit'
+  TELS          phones
+  LABELS
 
   my $addresses = $vcard->get({ 'element_type' => 'addresses' });
   foreach my $address (@{$addresses}) {
@@ -245,8 +293,15 @@ sub DESTROY {
 This method is used internally to lookup those nodes which have multiple elements,
 e.g. GEO has lat and long, N (name) has family, given, middle etc.
 
-If you wish to extend this package (for custom attributes), use this as a base and
-replace the get_lookup method, every thing else should just work [TM]
+If you wish to extend this package (for custom attributes), overload this method
+in your code
+
+  sub my_lookup {
+		return \%my_lookup;
+  }
+  *Text::vCard::get_lookup = \&my_lookup;
+
+This has not been tested yet.
 
 =cut 
 
@@ -331,6 +386,7 @@ sub _add_node {
 	my $value_fields = $self->get_lookup();
 	
 	my $node_type = uc($conf->{node_type});
+	$node_type = $node_aliases{$node_type} if defined $node_aliases{$node_type};
 
 	my $field_list;
 				

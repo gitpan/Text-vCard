@@ -5,7 +5,7 @@ use Carp;
 use Data::Dumper;
 
 use vars qw ( $AUTOLOAD $VERSION );
-$VERSION = '1.1';
+$VERSION = '1.2';
 
 =head1 NAME
 
@@ -83,7 +83,6 @@ sub new {
 	
 	if(defined $conf->{'data'}) {
 		# Populate now, rather than later (via AUTOLOAD)
-
 		# store values into object
 		if(defined $conf->{'data'}->{'param'}) {
 			# Handle the parameters
@@ -105,6 +104,7 @@ sub new {
 			if(scalar(@elements) == scalar(@{$self->{'field_order'}})) {
 				@{$self}{@{$self->{'field_order'}}} = @elements;
 			} else {
+				print Dumper(@elements);
 				carp 'Data value had ' . scalar(@elements) . ' elements expecting ' . scalar(@{$self->{'field_order'}});
 			}
 		}

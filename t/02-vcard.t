@@ -105,36 +105,17 @@ my $home_adds_get = $vcard->get({
 
 is(scalar(@{$home_adds_get}),2,'get() types returns 2 not 3 addresses');
 
+#####
+# test the auto generated methods
+#####
 
+is($vcard->FN(),'T-firstname T-surname','autogen methods - got FN');
+is($vcard->fullname('new name'),'new name','autogen methods - updated fullname');
+is($vcard->fn(),'new name','autogen methods - got new fn');
 
+# try adding a new one
+is($vcard->email(),undef,'autogen methods - undef for no email as expected');
+is($vcard->email('n.e@body.com'),'n.e@body.com','autogen methods - new value set');
 
-#my $addresses2 = $vcard->get({ 'element_type' => 'addresses', 'types' => 'pref' });
-
-#  foreach my $address (@{$addresses2}) {
-#	print Dumper($address);
-#	print "Prefered\n" if $address->is_type('pref');
-#	print $address->street() . "\n";
-#  }
-
-
-#foreach my $address (@{$home_adds}) {
-#	print Dumper($address->{params});
-#	print "Check $type is ok\n" if $address->is_type($type);
-#	print "Check $type is NOT ok\n" unless $address->is_type($type);
-
-#}
-
-
-#my $new_address = $vcards->[0]->add_node()
-
-
-  # Setting values on an address element
-#  $addresses->[0]->street('The burrows');
-#  $addresses->[0]->region('Wimbeldon common');
-
-  # Checking an address is a specific type
-#  $addresses->[0]->is_type('fax');
-#  $addresses->[0]->add_types('home');
-#  $addresses->[0]->remove_types('work');
-
+is($vcard->birthday('new bd'),'new bd','autogen added with alias');
 

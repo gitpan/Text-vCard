@@ -13,4 +13,5 @@ t/simple.vcf
 t/mix_type.vcf
 t/evolution.vcf
 t/apple_2.1_unicode.vcf
+t/apple_version3.vcf
 META.yml                                Module meta-data (added by MakeMaker)

@@ -10,7 +10,7 @@ use Text::vCard;
 # See this module for your basic parser functions
 use base qw(Text::vFile::asData);
 use vars qw ($VERSION);
-$VERSION = '1.1';
+$VERSION = '1.2';
 
 =head1 NAME
 

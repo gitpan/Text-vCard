@@ -1,6 +1,13 @@
 Revision history for Perl extension Text::vCard.
 
+1.2 Sat Oct 2nd 2003
+	- Changed so can parse group.NODE, the group is ignored for now
+	- Added test for apple vcard version 3
+	- emailed asData author about small buy with types (home/pref)
+	- added autogen methods; $vcard->fn(), $vcard->fullname($value)
+
 1.1 Wed Sept 15th 2003
+	- Lots of tests added
 	- Restructured (it's Tom's fault) so we use Addressbook as the main
 	interface, and Text::vCard is a single card, in the Addressbook object
 	- Renamed add_type to add_types
