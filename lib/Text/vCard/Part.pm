@@ -1,13 +1,14 @@
 package Text::vCard::Part;
 
 use strict;
-my $VERSION = '0.02';
+use Carp;
+use vars qw ( $AUTOLOAD );
 
 =head1 NAME
 
 Text::vCard::Part - Parent object to handle several parts of a vCard
 
-=head1 
+=head1 SYNOPSIS
 
 	package YOUR_PACKAGE_NAME_HERE;
 	use base qw(Text::vCard::Part);
@@ -42,6 +43,15 @@ sub new {
 		my $conf = $item->config();
 		# If there are field names apply them
 		if(defined $conf->{'field_names'}) {
+			# store into attr so we can create AUTOLOAD methods
+			my %fields;
+			map { $fields{$_} = 1 } @{$conf->{'field_names'}};
+			$item->{attr}->{'methods'} = \%fields;
+			# store the order as well, messy but will do for now,
+			# less expensive than callinf $item->config for all updates 
+			$item->{attr}->{'field_order'} = $conf->{'field_names'};
+			
+			# store values into object
 			@{$item}{@{$conf->{'field_names'}}} = split(/;/, $item->{'value'});
 		}
 	}
@@ -115,6 +125,55 @@ sub remove_type {
 	delete $self->{type}->{$type} if defined $self->{type} && $self->{type}->{$type};
 
 }
+=head2 update_value()
+
+  my $value = $part->update_value();
+  
+This method updates and returns the value string of a part.
+It is only needs to be called when exporting the information 
+back out to ensure that it has not been altered.
+
+
+NOTE: considered running it everytime a field was updated but
+that seemed like overkill.
+
+=cut
+
+sub update_value {
+	my $self = shift;
+	$self->{'value'} = join(';', map { $self->{$_} } @{$self->{attr}->{'field_order'}}  );
+	return $self->{'value'};
+}
+
+# creates methods for a part object based on the field_names in the config
+# hash of the part.
+sub DESTROY {
+}
+
+sub AUTOLOAD {
+	my $name = $AUTOLOAD;
+	$name =~ s/.*://;
+
+	# Upper case the name
+	$name = lc($name);
+
+	croak "No object supplied" unless $_[0];
+	
+	if($_[1] && defined $_[0]->{$name}) {
+		# set it
+		if(ref($_[1]) eq 'ARRAY') {
+			$_[0]->{$name} = join(',', @{$_[1]});
+		} else {
+			$_[0]->{$name} = $_[1];
+		}
+	}
+	
+	if(defined $_[0]->{$name}) {
+		# Return it
+		return $_[0]->{$name};	
+	}
+}	
+
 
 =head2 EXPORT
 

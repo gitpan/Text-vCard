@@ -6,7 +6,7 @@ use base qw(Text::vCard::Part);
 
 sub config {
 	my %config = (
-		'field_names' 		=> ['pobox','extad','street','locality','region','pcode','country'],
+		'field_names' 		=> ['po_box','extended','street','city','region','post_code','country'],
 	);
 	return \%config;
 }
@@ -20,7 +20,61 @@ Text::vCard::Part::Address - Object to handle the address parts of a vCard
 You should not need to access this object directly it will be created as
 required when you parse a vCard. - not fully implimented!
 
-=head1 METHODS
+=head1 ADDRESS DETAIL METHODS
+
+Called without any arguments the following methods return 
+a scalar containing the relevant information. This can
+be a list seperated by commas.
+
+If supplied with a scalar argument the scalar will be set as
+the new value. If supplied with an array ref the values
+of the array ref will be joined with a comma and set as
+the new value.
+
+=head2 po_box()
+
+  my $po_box = $address->po_box();
+  $address->po_box($po_box);
+  $address->po_box(\@po_boxes);
+
+
+=head2 extended()
+
+  my $extended = $address->extended();
+  $address->extended($extended);
+  $address->extended(\@extendedes);
+
+=head2 street()
+
+  my $street = $address->street();
+  $address->street($street);
+  $address->street(\@streetes);
+
+=head2 city()
+
+  my $city = $address->city();
+  $address->city($city);
+  $address->city(\@cityes);
+
+=head2 region()
+
+  my $region = $address->region();
+  $address->region($region);
+  $address->region(\@regiones);
+
+=head2 post_code()
+
+  my $post_code = $address->post_code();
+  $address->post_code($post_code);
+  $address->post_code(\@post_codees);
+
+=head2 country()
+
+  my $country = $address->country();
+  $address->country($country);
+  $address->country(\@countryes);
+
+=head1 OTHER METHODS
 
 =head2 types()
 
@@ -66,8 +120,6 @@ Add a type to an address.
 This method removes a type from an address.
 
 
-
-
 =head1 STILL TO IMPLIMENT
 
 # These can take a scalar or an array, return the 'pref' if possible or the right order.
@@ -105,7 +157,7 @@ $new_address->city("ottawa");
 
 =cut
 
-=head2 EXPORT
+=head1 EXPORT
 
 None by default.
 

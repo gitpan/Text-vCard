@@ -1,8 +1,13 @@
 package Text::vCard;
 
+use Carp;
+
+use Text::vCard::Part::Name;
 use Text::vCard::Part::Address;
+
 # See this module for your basic parser functions
 use base qw(Text::vFile::Base);
+use vars qw ( $AUTOLOAD );
 
 # Tell vFile that BEGIN:VCARD line creates one of these objects
 $Text::vFile::classMap{'VCARD'}=__PACKAGE__;
@@ -11,7 +16,7 @@ $Text::vFile::classMap{'VCARD'}=__PACKAGE__;
 
 Text::vCard - a package to parse, edit and create vCards (RFC 2426) 
 
-=SYNOPSIS
+=head1 SYNOPSIS
 
     use Text::vCard;
     my $loader = Text::vCard->loader( source => "xmas_card_list.vcf" );
@@ -29,19 +34,100 @@ Text::vCard - a package to parse, edit and create vCards (RFC 2426)
 =head1 DESCRIPTION
 
 Still under active development.
-    
-=cut    
-    
+
+=head1 METHODS
+
+=head2 fn()
+
+  my $fn = $vcard->fn();
+  
+This method will return the full name of the person.
+
+=head2 
+
+=head2 addresses()
+
+	my @addresses = $vcard->addresses();
+	my $address_array_ref = $vcard->addresses();
+	
+This method returns an array or array ref containing 
+Text::vCard::Part::Address objects.
+
+TODO: Supply 'types' of addresses required.
+
+=cut
+
+sub addresses {
+	my $self = shift;
+	
+	my @list = @{$self->{ADR}};
+	
+	return wantarray ? @{$self->{ADR}} : $self->{ADR};	
+	
+}
+
+=head2 name()
+
+  my $name = $vcard->name();
+  
+This method returns the Text::vCard::Part::Name object
+if available, it returns undef if not.
+
+=cut
+
+sub n {
+	my $self = shift;
+	if(defined $self->{N}) {
+		return $self->{N};	
+	}
+	return undef;
+}
+
+sub DESTROY {
+}
+
+
+sub AUTOLOAD {
+	my $name = $AUTOLOAD;
+	$name =~ s/.*://;
+
+	croak "No object supplied" unless $_[0];
+
+	# Upper case the name
+	$name = uc($name);
+	
+	my $varHandler = varHandler();
+	
+	if(defined $varHandler->{$name}) {
+		if($varHandler->{$name} eq 'singleText') {
+			if($_[1]) {
+				$_[0]->{$name}->{value} = $_[1];	
+			}
+			return $_[0]->{$name}->{value};
+			return undef;
+		}
+	
+########## MORE STUFF FOR OTHER TYPES
+	} else {
+		croak "Unknown method $name";
+	}
+}	
+
+#### Stuff to make it work!
 
 # This shows mapping of data type based on RFC to the appropriate handler
 sub varHandler {
+
+# Handled by a 'part' object
+#        'N'           => 'N',
+#        'ADR'         => 'ADR',
+
+
 	return {
         'FN'          => 'singleText',
-        'N'           => 'N',
         'NICKNAME'    => 'multipleText',
         'PHOTO'       => 'singleBinary',
         'BDAY'        => 'singleText',
-        'ADR'         => 'ADR',
         'LABEL'       => 'singleTextTyped',
         'TEL'         => 'singleTextTyped',
         'EMAIL'       => 'singleTextTyped',
@@ -67,6 +153,7 @@ sub varHandler {
 	};
 };
 
+# If the part has default types and none it self use them.
 sub typeDefault {
 
     return {
@@ -78,6 +165,7 @@ sub typeDefault {
 
 }
 
+# Load the address object
 sub load_ADR {
 
 	my $self=shift;
@@ -88,27 +176,11 @@ sub load_ADR {
 
 }
 
+# Load the N object
 sub load_N {
-
 	my $self=shift;
-
 	my $item = $self->SUPER::load_singleText(@_);
-
-	# use a hash slice to join the fieldnames with the values in the hash
-	my @field_names = ('family','given','middle','prefixes','suffixes');	
-	@item{@field_names} = split /,/, $item->{'value'};
-
-	# etc.
-
-}
-
-sub addresses {
-	my $self = shift;
-	
-	my @list = @{$self->{ADR}};
-	
-	return wantarray ? @{$self->{ADR}} : $self->{ADR};	
-	
+	return Text::vCard::Part::Name->new($item); 
 }
 
 =head2 EXPORT
@@ -132,7 +204,7 @@ of and for creating Text::vFile from our discussions.
 
 =head1 SEE ALSO
 
-Text::vFile::Base, Text::vFile.
+Text::vFile::Base, Text::vFile, Text::vCard::Part::Address, Text::vCard::Part::Name.
 
 =cut
 

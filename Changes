@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::vCard.
 
+0.4  Wed May  7 14:48:20 2003
+	- Lots of new stuff, it's starting to take shape
+
 0.3  Wed May  7 10:20:20 2003
 	- Cleaned up the docs, structure (now in lib/) and Makefile.PL
 
