@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::vCard.
 
+0.5  Fri May  9 08:30:00 2003
+	- More accessor methods added, docs and tests
+
 0.4  Wed May  7 14:48:20 2003
 	- Lots of new stuff, it's starting to take shape
 

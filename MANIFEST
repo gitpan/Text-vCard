@@ -6,3 +6,5 @@ lib/Text/vCard.pm
 lib/Text/vCard/Part.pm
 lib/Text/vCard/Part/Address.pm
 lib/Text/vCard/Part/Name.pm
+lib/Text/vCard/Part/Geo.pm
+lib/Text/vCard/Part/MultipleText.pm
