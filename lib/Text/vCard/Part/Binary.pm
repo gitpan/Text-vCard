@@ -3,7 +3,7 @@ package Text::vCard::Part::Binary;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = '0.9';
+$VERSION = '1.0';
 
 use base qw(Text::vCard::Part);
 
@@ -24,9 +24,9 @@ required when you parse a vCard. - not fully implimented!
 
 =head1 ADDRESS DETAIL METHODS
 
-my $value = $address->method();
-$address->method($value);
-$address->method(\@values);
+  my $value = $address->method();
+  $address->method($value);
+  $address->method(\@values);
 
 Called without any arguments the following methods return 
 a scalar containing the relevant information. This can

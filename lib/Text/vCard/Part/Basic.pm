@@ -3,7 +3,7 @@ package Text::vCard::Part::Basic;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = '0.9';
+$VERSION = '1.0';
 
 use base qw(Text::vCard::Part);
 

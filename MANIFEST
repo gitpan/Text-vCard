@@ -2,8 +2,12 @@ Changes
 MANIFEST
 Makefile.PL
 TODO
-t/01.t
+t/01-basic.t
 t/simple.vcf
+t/02-evolution.t
+t/evolution.vcf
+t/03-phone_v1.t
+t/phone_v1.vcf
 lib/Text/vCard.pm
 lib/Text/vCard/Part.pm
 lib/Text/vCard/Part/Address.pm

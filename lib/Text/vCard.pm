@@ -12,7 +12,7 @@ use Text::vCard::Part::Geo;
 # See this module for your basic parser functions
 use base qw(Text::vFile::Base);
 use vars qw ( $AUTOLOAD $VERSION );
-$VERSION = '0.9';
+$VERSION = '1.0';
 
 # Tell vFile that BEGIN:VCARD line creates one of these objects
 $Text::vFile::classMap{'VCARD'}=__PACKAGE__;
@@ -35,12 +35,13 @@ Text::vCard - a package to parse, edit and create vCards (RFC 2426)
 This package provides an API to reading / editing and creating
 vCards. A vCard is an electronic business card. This package has
 been developed based on rfc2426 which is version 3, we are working
-to activly support version 2.1 as well.
+to activly support version 2.1 as well (it works for most stuff other
+than 'type' on elements such as tel and address).
 
 You will find that many applications (Apple Address book, MS Outlook,
 Evolution etc) can export and import vCards. 
 
-=TODO
+=head1 TODO
 
 - Write out vCards (will be part of Text::vFile).
 - Support 'types' on version 2.1 of vCards.
@@ -49,7 +50,7 @@ Evolution etc) can export and import vCards.
 =head1 READING IN VCARDS
 
   use Text::vCard;
-  my $cards = Text::vCard->load( "foo.vCard", "blort.vCard", "whee.vCard" );
+  my $cards = Text::vCard->load( "foo.vCard", "blort.vCard");
 
   foreach my $vcard (@{$cards}) {
 	$vcard->...;
@@ -269,10 +270,13 @@ Time Zone
 
 =cut
 
+# This doesn't feel right, I'm sure we shouldn't need
+# arrays here, but that's what we are getting.
+
 sub tz {
 	my $self = shift;
-	if(defined $self->{TZ}) {
-		return $self->{TZ};	
+	if(defined $self->{TZ} && defined $self->{TZ}->[0]) {
+		return $self->{TZ}->[0];	
 	}
 	return undef;
 }
@@ -285,8 +289,8 @@ Unique Identifier
 
 sub uid {
 	my $self = shift;
-	if(defined $self->{UID}) {
-		return $self->{UID};	
+	if(defined $self->{UID} && defined $self->{UID}->[0]) {
+		return $self->{UID}->[0];
 	}
 	return undef;
 }
@@ -329,11 +333,12 @@ API still to be finalised.
 
 =head2 logo()
 
+=cut
+
 #=head1 ADDING ELEMENTS
 #my $address = $vcard->address_new({
 #	'street' => 'The Street',
 #});
-=cut
 
 #sub address_new {
 #	my($self,$conf) = @_;

@@ -1,7 +1,14 @@
 Revision history for Perl extension Text::vCard.
 
+1.0  Wed July  23rd 11:18:00 2003
+	- More doc fixing
+	- Fixed bug in UID and TZ
+	- test 02-evolution.t ready for Jay's 'type' fix to support v2.1
+	- test 03-phone_v1.t ready for Jay's 'type' fix to support v1.0
+
 0.9  Sat July  07 10:19:00 2003
 	- Fixed major doc error!
+
 
 0.8  Sat May  17 21:19:00 2003
 	- Added ability to specify types and tests

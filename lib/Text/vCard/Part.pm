@@ -4,7 +4,7 @@ use strict;
 use Carp;
 
 use vars qw ( $AUTOLOAD $VERSION );
-$VERSION = '0.9';
+$VERSION = '1.0';
 
 
 # This ain't working - anyone know why ?
