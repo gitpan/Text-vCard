@@ -1,0 +1,6 @@
+Revision history for Perl extension Text::vCard::Part::Name.
+
+0.01  Mon May  5 18:20:02 2003
+	- original version; created by h2xs 1.2 with options
+		-A -X -n Text::vCard::Part::Name
+
