@@ -1,5 +1,9 @@
 Revision history for Perl extension Text::vCard.
 
+1.8 Fri 15th Oct 2004
+	- Applied patch from Aaron Cope for version stuff, can
+	  now access it as lowercase version().
+
 1.7 Wed 13th Oct 2004
 	- remembered to update module versions as well as makefile!
 

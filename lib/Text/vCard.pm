@@ -10,7 +10,7 @@ use Text::vCard::Node;
 # See this module for your basic parser functions
 use base qw(Text::vFile::asData);
 use vars qw ($VERSION %lookup %node_aliases @simple);
-$VERSION = '1.7';
+$VERSION = '1.8';
 
 # If the node's data does not break down use this
 my @default_field = qw(value);
@@ -33,7 +33,7 @@ my @default_field = qw(value);
 );
 
 # Generate all our simple methods
-@simple = qw(FN BDAY MAILER TZ TITLE ROLE NOTE PRODID REV SORT-STRING UID URL VERSION CLASS FULLNAME BIRTHDAY TZ NAME EMAIL NICKNAME PHOTO);
+@simple = qw(FN BDAY MAILER TZ TITLE ROLE NOTE PRODID REV SORT-STRING UID URL CLASS FULLNAME BIRTHDAY TZ NAME EMAIL NICKNAME PHOTO);
 # Now we want lowercase as well
 map { push(@simple,lc($_)) } @simple;
 
@@ -41,7 +41,10 @@ map { push(@simple,lc($_)) } @simple;
 {
 	no strict 'refs';
 	no warnings;
-	for my $node (@simple) { 
+        # 'version' handled separately
+        # to prevent conflict with ExtUtils::MakeMaker
+        # and $VERSION
+	for my $node (@simple,"version") { 
 		*$node = sub { 
 			my ($self,$value) = @_; 
 			# See if we have it already
@@ -63,7 +66,7 @@ map { push(@simple,lc($_)) } @simple;
 			return $nodes->[0]->value() if scalar($nodes);
 			return undef;
 		}
-	}
+	    }
 }
 
 =head1 NAME
@@ -225,7 +228,8 @@ For simple nodes, you can also access the first node in the following way:
   $vcard->fullname('new name');
 
 The node will be automatically created if it does not exist and you supplied a value.
-undef is returned if the node does not exist.
+undef is returned if the node does not exist. Simple nodes can be called as all upper
+or all lowercase method names.
 
   vCard Spec: 'simple'    Alias
   --------------------    --------
@@ -245,7 +249,8 @@ undef is returned if the node does not exist.
   EMAIL
   NICKNAME
   PHOTO
-
+  version (lowercase only)
+  
 =head2 more complex vCard nodes
 
   vCard Spec    Alias           Methods on object
@@ -256,7 +261,6 @@ undef is returned if the node does not exist.
   ORG                           'name','unit'
   TELS          phones
   LABELS
-  VERSION (special case as conflicts with $VERSION)
 
   my $addresses = $vcard->get({ 'node_type' => 'addresses' });
   foreach my $address (@{$addresses}) {
