@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 
-my $VERSION = '1.2';
+my $VERSION = '1.3';
 
 my $ABSTRACT = "Module for parsing and creating vCards (RFC 2426) address";
 
@@ -12,5 +12,6 @@ WriteMakefile(
 	'PREREQ_PM'		=> {
     	'Text::vFile::asData' => '0.01',
     	'Test::More' => '0.1',
+	'File::Slurp' => '9999.04',
     }, 
 );

@@ -10,7 +10,7 @@ use Text::vCard::Node;
 # See this module for your basic parser functions
 use base qw(Text::vFile::asData);
 use vars qw ($VERSION %lookup %node_aliases @simple);
-$VERSION = '1.2';
+$VERSION = '1.3';
 
 %lookup = (
 	'ADR' => ['po_box','extended','street','city','region','post_code','country'],
@@ -91,6 +91,9 @@ This package is for a single vCard (person / record / set of address information
 It provides an API to editing and creating vCards, or supplied a specific piece
 of the Text::vFile::asData results it generates a vCard with that content.
 
+You should really use Text::vCard::Addressbook as this handles creating
+vCards from an existing file for you.
+
 =head1 METHODS
 
 =head2 new()
@@ -138,10 +141,10 @@ my $address = $vcard->add_node({
 	'node_type' => 'ADR',
 });
 
-This creates a new address in the vcard which you can then call the
-address methods on, see below for what options are available.
+This creates a new address in the vCard which you can then call the
+address methods on. See below for what options are available.
 
-A node_type must be supplied, in the vCard Spec format (e.g. ADR not address)
+The node_type parameter must confirm to the vCard spec format (e.g. ADR not address)
 
 =cut
 
@@ -159,26 +162,26 @@ sub add_node {
   
 =head2 get()
 
-This method allows you to get content out of a vcard.
+The following method allows you to extract the contents from the vCard.
 
   # get all elements
   $nodes = $vcard->get('tels');
 
   # Just get the home address
   my $nodes = $vcard->get({
-	'element_type' => 'addresses',
+	'node_type' => 'addresses',
 	'types' => 'home',
   });
   
   # get all phone number that matches serveral types
   my @types = qw(work home);
   my $nodes = $vcard->get({
-	'element_type' => 'tels',
+	'node_type' => 'tels',
 	'types' => \@types,
   });
  
 Either an array or array ref is returned, containing Text::vCard::Node objects.
-If there are no results of 'element_type' undef is returned.
+If there are no results of 'node_type' undef is returned.
 
 Supplied with a scalar or an array ref the methods
 return a list of nodes of a type, where relevant. If any
@@ -191,8 +194,8 @@ sub get {
 	my ($self,$conf) = @_;
 	carp "You did not supply an element type" unless defined $conf;
 	if(ref($conf) eq 'HASH') {
-		return $self->get_of_type($conf->{'element_type'},$conf->{'types'}) if defined $conf->{'types'};
-		return $self->get_of_type($conf->{'element_type'});
+		return $self->get_of_type($conf->{'node_type'},$conf->{'types'}) if defined $conf->{'types'};
+		return $self->get_of_type($conf->{'node_type'});
 	} else {
 		return $self->get_of_type($conf);
 	}
@@ -200,10 +203,10 @@ sub get {
 
 =head2 nodes
 
-  my $fullname = ($vcard->get({ 'element_type' => 'fullname' }))[0];
+  my $first_address = ($vcard->get({ 'node_type' => 'address' }))[0];
   
   # get the value
-  print $fullname->value();
+  print $first_address->street();
 
   # set the value
   $fullname->value('Barney Rubble');
@@ -242,7 +245,7 @@ undef is returned if the node does not exist.
   NICKNAME
   PHOTO
 
-=head2 more complex vcard nodes
+=head2 more complex vCard nodes
 
   vCard Spec    Alias           Methods on object
   ----------    ----------      -----------------
@@ -253,7 +256,7 @@ undef is returned if the node does not exist.
   TELS          phones
   LABELS
 
-  my $addresses = $vcard->get({ 'element_type' => 'addresses' });
+  my $addresses = $vcard->get({ 'node_type' => 'addresses' });
   foreach my $address (@{$addresses}) {
 	print $address->street();
   }
@@ -312,7 +315,7 @@ sub get_lookup {
 
 =head2 get_of_type()
 
-  my $list = $vcard->get_of_type($element_type,\@types);
+  my $list = $vcard->get_of_type($node_type,\@types);
 
 It is probably easier just to use the get() method, which inturn calls
 this method.
@@ -321,15 +324,15 @@ this method.
 
 # Used to get the right elements
 sub get_of_type {
-	my ($self, $element_type, $types) = @_;
+	my ($self, $node_type, $types) = @_;
 
 	# Upper case the name
-	$element_type = uc($element_type);
+	$node_type = uc($node_type);
 
 	# See if there is an alias for it
-	$element_type = uc($node_aliases{$element_type}) if defined $node_aliases{$element_type};
+	$node_type = uc($node_aliases{$node_type}) if defined $node_aliases{$node_type};
 
-	return undef unless defined $self->{$element_type};
+	return undef unless defined $self->{$node_type};
 
 	if($types) {
 		# After specific types
@@ -342,7 +345,7 @@ sub get_of_type {
 			#	print "T: $types\n";
 		}
 		my @to_return;
-		foreach my $element (@{$self->{$element_type}}) {
+		foreach my $element (@{$self->{$node_type}}) {
 			my $check = 1; # assum ok for now
 			foreach my $type (@of_type) {
 				# set it as bad if we don't match				
@@ -366,7 +369,7 @@ sub get_of_type {
 	
 	} else {
 		# Return them all
-		return wantarray ? @{$self->{$element_type}} : $self->{$element_type};	
+		return wantarray ? @{$self->{$node_type}} : $self->{$node_type};	
 	}	
 }
 

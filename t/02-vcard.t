@@ -93,13 +93,13 @@ eval {
 };
 like($@,qr/You did not supply an element type/,'get() croaks is no params supplied');
 
-my $addresses = $vcard->get({ 'element_type' => 'addresses' });
+my $addresses = $vcard->get({ 'node_type' => 'addresses' });
 my $also_addresses = $vcard->get('addresses');
 
-ok(eq_array($addresses,$also_addresses),'get() with single element and element_type match');
+ok(eq_array($addresses,$also_addresses),'get() with single element and node_type match');
 
 my $home_adds_get = $vcard->get({ 
-	'element_type' => 'addresses',
+	'node_type' => 'addresses',
 	'types' => [ 'home','pref' ],
 });
 

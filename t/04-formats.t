@@ -22,7 +22,7 @@ foreach my $card_type (@card_types) {
 	my $vcard = $vcards->[0];
 	is($vcard->get('fn')->[0]->value(),'T-firstname T-surname',"$card_type has fn data correct");
 	my $t = $vcard->get({
-		'element_type' => 'tel',
+		'node_type' => 'tel',
 		'types' => 'home',
 	});
 	is($t->[0]->value(),'020 666 6666','got expected phone number');

@@ -73,7 +73,7 @@ $address->city('Buffyvill');
 # Now get it out of the address book
 my $card_a = $newadbk->vcards();
 is(ref($card_a),'ARRAY','vcards() - returns array ref when in context');
-is($card_a->[0]->get({ 'element_type' => 'ADR'})->[0]->street(),'19 The mews','exstracted address ok'),
+is($card_a->[0]->get({ 'node_type' => 'ADR'})->[0]->street(),'19 The mews','exstracted address ok'),
 
 my @vcard_list = $newadbk->vcards();
 is(scalar(@vcard_list),1,'vcards() returns array when in context');
