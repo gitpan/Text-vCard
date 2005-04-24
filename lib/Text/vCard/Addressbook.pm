@@ -10,7 +10,7 @@ use Text::vCard;
 # See this module for your basic parser functions
 use base qw(Text::vFile::asData);
 use vars qw ($VERSION);
-$VERSION = '1.92';
+$VERSION = '1.94';
 
 =head1 NAME
 
@@ -177,7 +177,7 @@ sub _process_text {
 	my $data = $asData->parse_lines(split("\n",$text));
 	foreach my $card (@{$data->{'objects'}}) {
 		# Run through each card in the data
-		if($card->{'type'} eq 'VCARD') {
+		if($card->{'type'} =~ /VCARD/i) {
 			my $vcard = Text::vCard->new({
 				'asData_node' => $card->{'properties'},
 			});
