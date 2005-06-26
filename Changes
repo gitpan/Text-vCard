@@ -1,5 +1,11 @@
 Revision history for Perl extension Text::vCard.
 
+1.95 Sun 26th June 2005
+	- Made export() work for address book, still missing encoding
+	  though.
+	- Added basic test for export()
+	- A few little clean up things
+
 1.94 Sun 24th April 2005
         - Made check for 'VCARD' tag case insensative,
         probably won't help until Text::vFile::asData does as well.

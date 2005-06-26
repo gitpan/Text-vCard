@@ -2,10 +2,10 @@ package Text::vCard::Node;
 
 use strict;
 use Carp;
-use Data::Dumper;
+use String::ShellQuote;
 
 use vars qw ( $AUTOLOAD $VERSION );
-$VERSION = '1.92';
+$VERSION = '1.95';
 
 =head1 NAME
 
@@ -307,7 +307,22 @@ back out to ensure that it has not been altered.
 
 sub export_data {
 	my $self = shift;
-	return join(';', map { defined $self->{$_} ? $self->{$_} : '' } @{$self->{'field_order'}}  );
+	my @lines = map { 
+		if(defined $self->{$_}) {
+			if(ref($self->{$_}) eq 'ARRAY') {
+				# Handle things like org etc which have 'units'
+				join(',',@{$self->{$_}});
+			} else {
+				$self->{$_};
+			}
+		} else {
+			'';
+		}
+	} @{$self->{'field_order'}};
+
+	# Should escape stuff here really, but waiting to see what T::vfile::asData does
+	return join(';', @lines);
+
 }
 
 # Beause we have autoload

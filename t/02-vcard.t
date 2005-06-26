@@ -2,7 +2,7 @@
 
 use strict;
 
-use lib qw( ./blib/lib ../blib/lib );
+use blib;
 
 use Test::More tests => 28;
 use Data::Dumper;

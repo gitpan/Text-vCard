@@ -2,7 +2,6 @@ package Text::vCard;
 
 use Carp;
 use strict;
-use Data::Dumper;
 use File::Slurp;
 use Text::vFile::asData;
 use Text::vCard::Node;
@@ -10,7 +9,7 @@ use Text::vCard::Node;
 # See this module for your basic parser functions
 use base qw(Text::vFile::asData);
 use vars qw ($VERSION %lookup %node_aliases @simple);
-$VERSION = '1.93';
+$VERSION = '1.95';
 
 # If the node's data does not break down use this
 my @default_field = qw(value);
@@ -79,7 +78,7 @@ You probably want to start with Text::vCard::Addressbook, then this module.
 
 This is not backwards compatable with 1.0 or earlier versions! 
 
-Version 1.1 is a complete rewrite/restructure, this should not happen again.
+Version 1.1 was a complete rewrite/restructure, this should not happen again.
 
 =head1 SYNOPSIS
 
@@ -431,8 +430,6 @@ sub get_of_type {
 			_sort_prefs($b) <=> _sort_prefs($a)
 		} @to_return;
 
-		#	print "Returning: " . Dumper(@to_return);
-
 		return wantarray ? @to_return : \@to_return;	
 	
 	} else {
@@ -496,10 +493,7 @@ Leo Lapworth, LLAP@cuckoo.org
 
 =head1 BUGS
 
-There is an issue with the module this relies on to parse
-vcards (Text::vFile::asData) which segfaults if the vcard
-contains very long lines - e.g. if there is an image associated
-with the vcard.
+None that I'm aware of.
 
 =head1 COPYRIGHT
 

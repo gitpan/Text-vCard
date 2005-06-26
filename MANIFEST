@@ -9,6 +9,7 @@ t/01-node.t
 t/02-vcard.t
 t/03-addressbook.t
 t/04-formats.t
+t/05-export.t
 t/simple.vcf
 t/mix_type.vcf
 t/evolution.vcf

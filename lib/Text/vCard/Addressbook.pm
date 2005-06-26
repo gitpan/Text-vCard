@@ -2,7 +2,6 @@ package Text::vCard::Addressbook;
 
 use Carp;
 use strict;
-use Data::Dumper;
 use File::Slurp;
 use Text::vFile::asData;
 use Text::vCard;
@@ -10,7 +9,7 @@ use Text::vCard;
 # See this module for your basic parser functions
 use base qw(Text::vFile::asData);
 use vars qw ($VERSION);
-$VERSION = '1.94';
+$VERSION = '1.95';
 
 =head1 NAME
 
@@ -57,7 +56,7 @@ sub load {
 	my $self = __PACKAGE__->new();
 	
 	foreach my $file (@{$files}) {
-		croak "Unable to read file $file\n" unless -r $file;
+		croak "Unable to read file $file" unless -r $file;
 		$self->_process_text(scalar read_file($file));
 	}
 
@@ -148,17 +147,47 @@ sub vcards {
 	return wantarray ? @{$self->{cards}} : $self->{cards};
 }
 
-=head2 export_vcf
+=head2 export()
 
   my $vcf_file = $address_book->export()
 
-This method doesn't exist yet.
+This method returns the vcard data in the vcf file format.
+
+Please note there is no validation, you must ensure
+that the correct nodes (FN,N,VERSION) are already added
+to each vcard if you want to comply with RFC 2426.
+
+This does NOT currently escape the results correctly
+at the moment.
 
 =cut
 
-sub export_vcf {
+sub export {
 	my $self = shift;
-	print "Oi - I said this method doesn't exist yet!\n";
+	my @lines;
+	foreach my $vcard ($self->vcards()) {	
+		push @lines, 'BEGIN:VCARD';
+		while (my ($node_type,$nodes) = each %{ $vcard->{nodes} }) {
+
+			# Make sure all the nodes values are up to date
+			my @export_nodes;
+			foreach my $node (@{$nodes}) {
+				my $name = $node_type;
+				if($node->group()) {
+					# Add the group in to the name
+					$name = $node->group() . '.' . $node_type;
+				}
+
+				my $param = '';
+				$param = join (';', ($node->types())) if $node->types();
+				$name .= ";$param" if $param ne '';
+				push(@lines,"$name:" . $node->export_data);
+			}
+		}
+		push @lines, 'END:VCARD';
+	} 
+	my $vcf_file = join("\r\n",@lines);
+	return $vcf_file;
 }
 
 
@@ -183,7 +212,7 @@ sub _process_text {
 			});
 			push(@{$self->{'cards'}},$vcard);
 		} else {
-			carp "This file contains $card->{'type'} data which was not parsed\n";
+			carp "This file contains $card->{'type'} data which was not parsed";
 		}
 	}
 

@@ -3,9 +3,9 @@
 use strict;
 use Data::Dumper;
 
-use lib qw( ./blib/lib ../blib/lib );
+use blib;
 
-use Test::More qw(no_plan);
+use Test::More  tests => 13;
 
 local $SIG{__WARN__} = sub { die $_[0] };
 
@@ -78,17 +78,4 @@ is($card_a->[0]->get({ 'node_type' => 'ADR'})->[0]->street(),'19 The mews','exst
 my @vcard_list = $newadbk->vcards();
 is(scalar(@vcard_list),1,'vcards() returns array when in context');
 
-#####
-# export_vcf()
-#####
-
-ok($newadbk->export_vcf());
-
-
-
-
-
-
-
-#print Dumper($newadbk);
 

@@ -2,9 +2,9 @@
 
 use strict;
 
-use lib qw( ./blib/lib ../blib/lib );
+use blib;
 
-use Test::More qw(no_plan);
+use Test::More  tests => 17;
 # Check we can load module
 use Data::Dumper;
 BEGIN { use_ok( 'Text::vCard::Addressbook' ); }

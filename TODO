@@ -1,5 +1,7 @@
 Addressbook:
 
+Work out the escape stuff for export()
+
 find()
 	- get vcards matching specific criteria
 
