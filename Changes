@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::vCard.
 
+1.96 Sun 3rd July 2005
+	- Removed String::ShellQuote - forgot to PREREQ and not using it
+
 1.95 Sun 26th June 2005
 	- Made export() work for address book, still missing encoding
 	  though.

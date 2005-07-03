@@ -2,10 +2,9 @@ package Text::vCard::Node;
 
 use strict;
 use Carp;
-use String::ShellQuote;
 
 use vars qw ( $AUTOLOAD $VERSION );
-$VERSION = '1.95';
+$VERSION = '1.96';
 
 =head1 NAME
 

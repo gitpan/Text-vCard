@@ -9,7 +9,7 @@ use Text::vCard::Node;
 # See this module for your basic parser functions
 use base qw(Text::vFile::asData);
 use vars qw ($VERSION %lookup %node_aliases @simple);
-$VERSION = '1.95';
+$VERSION = '1.96';
 
 # If the node's data does not break down use this
 my @default_field = qw(value);
@@ -493,7 +493,7 @@ Leo Lapworth, LLAP@cuckoo.org
 
 =head1 BUGS
 
-None that I'm aware of.
+None that I'm aware of - export does not encode correctly.
 
 =head1 COPYRIGHT
 
