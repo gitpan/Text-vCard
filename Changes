@@ -1,5 +1,9 @@
 Revision history for Perl extension Text::vCard.
 
+1.97 Sun Jul  2 2006
+	- removed test because I don't think Test::More::is_deaply
+	works correctly on: perl 5.8.0 on Solaris x86 9
+
 1.96 Sun 3rd July 2005
 	- Removed String::ShellQuote - forgot to PREREQ and not using it
 
