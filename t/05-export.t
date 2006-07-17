@@ -4,7 +4,7 @@ use strict;
 
 use blib;
 
-use Test::More tests => 4;
+use Test::More tests => 3;
 
 use Data::Dumper;
 # Check we can load module

@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::vCard.
 
+1.98 Mon Jul 17 2006
+	- Test fix
+
 1.97 Sun Jul  2 2006
 	- removed test because I don't think Test::More::is_deaply
 	works correctly on: perl 5.8.0 on Solaris x86 9
