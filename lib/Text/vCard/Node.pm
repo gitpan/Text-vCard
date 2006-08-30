@@ -2,9 +2,9 @@ package Text::vCard::Node;
 
 use strict;
 use Carp;
-
+use MIME::QuotedPrint;
 use vars qw ( $AUTOLOAD $VERSION );
-$VERSION = '1.96';
+$VERSION = '1.97';
 
 =head1 NAME
 
@@ -103,7 +103,10 @@ sub new {
 		
 		if(defined $conf->{'data'}->{'value'} ) {
 			# Store the actual data into the object
-			
+		
+			if(defined $self->{params}->{'quoted-printable'}) {
+				$conf->{'data'}->{'value'} = decode_qp($conf->{'data'}->{'value'});
+			}
 			# the -1 on split is so ;; values create elements in the array	
 			my @elements = split(/(?<!\\);/, $conf->{'data'}->{'value'},-1);
 			if(defined $self->{node_type} && $self->{node_type} eq 'ORG') {
@@ -345,6 +348,12 @@ sub AUTOLOAD {
 	# Return it
 	return $_[0]->{$name};	
 }
+
+=head2 NOTES
+
+If a node has a param of 'quoted-printable' then the
+value is escaped (basically converting Hex return into \r\n
+as far as I can see).
 
 =head2 EXPORT
 
