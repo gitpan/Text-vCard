@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::vCard.
 
+2.00 Sat Oct 21 2006
+	- export now gives 'TYPE=x,y' instead of the incorrect 'x;y'
+	
 1.99 Wed 30th Aug 2006
 	- Added 'quoted-printable' fix [rt.cpan.org #17790]
 	this requires MIME::QuotedPrint

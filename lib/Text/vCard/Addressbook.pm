@@ -9,7 +9,7 @@ use Text::vCard;
 # See this module for your basic parser functions
 use base qw(Text::vFile::asData);
 use vars qw ($VERSION);
-$VERSION = '1.95';
+$VERSION = '1.96';
 
 =head1 NAME
 
@@ -157,7 +157,7 @@ Please note there is no validation, you must ensure
 that the correct nodes (FN,N,VERSION) are already added
 to each vcard if you want to comply with RFC 2426.
 
-This does NOT currently escape the results correctly
+This might not escape the results correctly
 at the moment.
 
 =cut
@@ -179,7 +179,7 @@ sub export {
 				}
 
 				my $param = '';
-				$param = join (';', ($node->types())) if $node->types();
+				$param = 'TYPE=' . join (',', ($node->types())) if $node->types();
 				$name .= ";$param" if $param ne '';
 				push(@lines,"$name:" . $node->export_data);
 			}

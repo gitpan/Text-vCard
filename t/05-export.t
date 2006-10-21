@@ -4,7 +4,7 @@ use strict;
 
 use blib;
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 use Data::Dumper;
 # Check we can load module
@@ -20,7 +20,7 @@ my @data = (
 	'TEL;pref;home:020 666 6666',
 	'TEL;cell:0777 777 7777',
 	'item2.ADR;work:;;Test Road;Test City;;Test Postcode;Test Country',
-	'item1.ADR;pref;home:;;Pref Test Road;Pref Test City;;Pref Test Postcode;Pref Test Country',
+	'item1.ADR;TYPE=pref,home:;;Pref Test Road;Pref Test City;;Pref Test Postcode;Pref Test Country',
 	'VERSION:3.0',
 	'FN:T-firstname T-surname',
 	'END:VCARD',
@@ -32,6 +32,9 @@ my @data = (
 my $adbk = Text::vCard::Addressbook->new({ 'source_file' => 't/apple_version3.vcf'});
 
 my $vcf = $adbk->export();
+
+like($vcf,qr/TYPE=work/,'export() - added type def');
+
 my @lines = split("\r\n",$vcf);
 
 is($lines[0],'BEGIN:VCARD','export() - First line correct');
