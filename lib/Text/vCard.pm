@@ -9,7 +9,7 @@ use Text::vCard::Node;
 # See this module for your basic parser functions
 use base qw(Text::vFile::asData);
 use vars qw ($VERSION %lookup %node_aliases @simple);
-$VERSION = '2.02';
+$VERSION = '2.03';
 
 # If the node's data does not break down use this
 my @default_field = qw(value);
@@ -31,7 +31,8 @@ my @default_field = qw(value);
     'TIMEZONE'  => 'TZ',
     'PHONES'    => 'TEL',
     'ADDRESSES' => 'ADR',
-    'NAME'      => 'N',
+    'NAME'      => 'N', # To be depreciated as clashes with RFC
+	'MONIKER'	=> 'N',
 );
 
 # Generate all our simple methods
@@ -281,7 +282,8 @@ or all lowercase method names.
 
   vCard Spec    Alias           Methods on object
   ----------    ----------      -----------------
-  N             name            'family','given','middle','prefixes','suffixes'
+  N             name (depreciated as conflicts with rfc, use moniker)
+  N             moniker            'family','given','middle','prefixes','suffixes'
   ADR           addresses       'po_box','extended','street','city','region','post_code','country'
   GEO                           'lat','long'
   TEL           phones
