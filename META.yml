@@ -1,14 +1,25 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Text-vCard
-version:      2.03
-version_from: lib/Text/vCard.pm
-installdirs:  site
+--- #YAML:1.0
+name:               Text-vCard
+version:            2.04
+abstract:           Module for parsing and creating vCards (RFC 2426) address
+author:
+    - Leo Lapworth
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
 requires:
-    File::Slurp:                   9999.04
-    MIME::QuotedPrint:             3.07
-    Test::More:                    0.1
-    Text::vFile::asData:           0.05
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+    File::Slurp:          9999.04
+    MIME::QuotedPrint:    3.07
+    Test::More:           0.1
+    Text::vFile::asData:  0.05
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

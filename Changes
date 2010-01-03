@@ -1,5 +1,9 @@
 Revision history for Perl extension Text::vCard.
 
+2.04 Sun  3 Jan 2010 16:42:59 GMT
+    - Switch to git repo
+    - Doc patch
+
 2.03 Sun Mar 16 10:10:54 GMT 2008
 	- added 'moniker' and marked 'name' as depreciated
 
