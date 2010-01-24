@@ -8,8 +8,6 @@ use Text::vCard;
 
 # See this module for your basic parser functions
 use base qw(Text::vFile::asData);
-use vars qw ($VERSION);
-$VERSION = '1.97';
 
 =head1 NAME
 
@@ -57,11 +55,25 @@ sub load {
 
     foreach my $file ( @{$files} ) {
         croak "Unable to read file $file" unless -r $file;
-        $self->_process_text( scalar read_file($file) );
+        $self->import_data( scalar read_file($file) );
     }
 
     return $self;
 
+}
+
+=head2 import_data()
+
+  $address_book->import_data($value);
+
+This method imports data directly from a string.
+
+=cut
+
+sub import_data {
+    my ( $self, $value ) = @_;
+
+    $self->_process_text($value);
 }
 
 =head2 new()
@@ -92,13 +104,13 @@ Looping through all vcards in an address book.
 sub new {
     my ( $proto, $conf ) = @_;
     my $class = ref($proto) || $proto;
-    my $self  = {};
+    my $self = {};
 
     if ( defined $conf->{'source_file'} ) {
 
         # Need to read in source file
         croak "Unable to read file $conf->{'source_file'}\n"
-          unless -r $conf->{'source_file'};
+            unless -r $conf->{'source_file'};
         $conf->{'source_text'} = read_file( $conf->{'source_file'} );
     }
 
@@ -110,7 +122,7 @@ sub new {
 
     # Process the text if we have it.
     $self->_process_text( $conf->{'source_text'} )
-      if defined $conf->{'source_text'};
+        if defined $conf->{'source_text'};
 
     return $self;
 }
@@ -210,12 +222,12 @@ sub _process_text {
 
         # Run through each card in the data
         if ( $card->{'type'} =~ /VCARD/i ) {
-            my $vcard =
-              Text::vCard->new( { 'asData_node' => $card->{'properties'}, } );
+            my $vcard = Text::vCard->new(
+                { 'asData_node' => $card->{'properties'}, } );
             push( @{ $self->{'cards'} }, $vcard );
-        }
-        else {
-            carp "This file contains $card->{'type'} data which was not parsed";
+        } else {
+            carp
+                "This file contains $card->{'type'} data which was not parsed";
         }
     }
 

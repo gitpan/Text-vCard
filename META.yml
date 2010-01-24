@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Text-vCard
-version:            2.05
+version:            2.06
 abstract:           Module for parsing and creating vCards (RFC 2426) address
 author:
     - Leo Lapworth
