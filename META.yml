@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Text-vCard
-version:            2.06
+version:            2.07
 abstract:           Module for parsing and creating vCards (RFC 2426) address
 author:
     - Leo Lapworth
@@ -9,14 +9,12 @@ distribution_type:  module
 configure_requires:
     ExtUtils::MakeMaker:  0
 build_requires:
-    Test::More:  0.1
+    ExtUtils::MakeMaker:  0
 requires:
     File::Slurp:          9999.04
     MIME::QuotedPrint:    3.07
-    perl:                 5.006
+    Test::More:           0.1
     Text::vFile::asData:  0.05
-resources:
-    repository:  http://github.com/ranguard/text-vcard
 no_index:
     directory:
         - t
