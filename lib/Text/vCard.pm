@@ -10,7 +10,7 @@ use Text::vCard::Node;
 # See this module for your basic parser functions
 use base qw(Text::vFile::asData);
 use vars qw ($VERSION %lookup %node_aliases @simple);
-$VERSION = '2.07';
+$VERSION = '2.09';
 
 # If the node's data does not break down use this
 my @default_field = qw(value);
@@ -568,7 +568,7 @@ it and/or modify it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-Text::vCard::Address, Text::vCard::Node
+Text::vCard::Addressbook, Text::vCard::Node
 
 =cut
 
