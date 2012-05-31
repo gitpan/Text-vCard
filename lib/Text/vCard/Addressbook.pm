@@ -2,6 +2,7 @@ package Text::vCard::Addressbook;
 
 use Carp;
 use strict;
+use warnings;
 use File::Slurp;
 use Text::vFile::asData;
 use Text::vCard;
@@ -15,6 +16,8 @@ Text::vCard::Addressbook - a package to parse, edit and create multiple vCards (
 
 =head1 SYNOPSIS
 
+To read an existing file:
+
   use Text::vCard::Addressbook;
 
   my $address_book = Text::vCard::Addressbook->new({
@@ -24,6 +27,19 @@ Text::vCard::Addressbook - a package to parse, edit and create multiple vCards (
   foreach my $vcard ($address_book->vcards()) {
 	print "Got card for " . $vcard->fullname() . "\n";
   }
+
+To create a new file:
+
+  use Text::vCard::Addressbook;
+
+  my $address_book = Text::vCard::Addressbook->new();
+  my $vcard = $ab->add_vcard;
+  $vcard->fullname('Foo Bar');
+  $vcard->EMAIL('foo@bar.com');
+
+  open my $out, '>', 'address.vcf' or die;
+  print $out $address_book->export;
+
 
 =head1 DESCRIPTION
 
@@ -133,7 +149,7 @@ sub new {
 
   my $vcard = $address_book->add_vcard();
 
-This method creates a new empty Text::vCard object, stores it in the
+This method creates a new empty L<Text::vCard> object, stores it in the
 address book and return it so you can add data to it.
 
 =cut
@@ -163,7 +179,7 @@ sub vcards {
 
 =head2 set_encoding()
 
-  $address_book->add_vcard('utf-8');
+  $address_book->set_encoding('utf-8');
 
 This method will add the string ';charset=utf-8' to each and 
 every vCard entry. That does help in connection with e.g. an iPhone...
@@ -233,6 +249,13 @@ sub _process_text {
 
     if($text =~ /quoted-printable/i) {
         # Edge case for 2.1 version
+        # 
+        # http://tools.ietf.org/html/rfc2045#section-6.7 point (5),
+        # lines containing quoted-printable encoded data can contain soft-line
+        # breaks. These are indicated as single '=' sign at the end of the line.
+        # 
+        # No longer needed in version 3.0:
+        # http://tools.ietf.org/html/rfc2426 point (5)
 
         my $joinline = 0;
 
@@ -300,11 +323,11 @@ it and/or modify it under the same terms as Perl itself.
 
 =head1 ACKNOWLEDGEMENTS
 
-The authors of Text::vFile::asData for making my life so much easier.
+The authors of L<Text::vFile::asData> for making my life so much easier.
 
 =head1 SEE ALSO
 
-Text::vCard, Text::vCard::Node
+L<Text::vCard>, L<Text::vCard::Node>
 
 =cut
 
