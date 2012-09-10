@@ -1,28 +1,33 @@
 ---
-abstract: 'Module for parsing and creating vCards (RFC 2426) address'
+abstract: 'a package to edit and create a single vCard (RFC 2426)'
 author:
   - 'Leo Lapworth'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  Data::Dumper: 0
+  Digest: 0
+  Test::More: 0
 configure_requires:
-  ExtUtils::MakeMaker: 0
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921'
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300018, CPAN::Meta::Converter version 2.120921'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
 name: Text-vCard
-no_index:
-  directory:
-    - t
-    - inc
 requires:
+  Carp: 0
+  Encode: 0
   File::Slurp: 9999.04
+  MIME::Base64: 3.07
   MIME::QuotedPrint: 3.07
-  Test::More: 0.1
   Text::vFile::asData: 0.07
+  base: 0
+  perl: 5.006
+  strict: 0
+  vars: 0
+  warnings: 0
 resources:
   bugtracker: https://github.com/ranguard/text-vcard/issues
   repository: https://github.com/ranguard/text-vcard
-version: 2.11
+version: 2.12

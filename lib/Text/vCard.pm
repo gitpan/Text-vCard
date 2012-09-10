@@ -1,17 +1,19 @@
 package Text::vCard;
+{
+  $Text::vCard::VERSION = '2.12';
+}
 
 use 5.006;
 use Carp;
 use strict;
 use warnings;
-use File::Slurp;
-use Text::vFile::asData;
+use File::Slurp 9999.04;
+use Text::vFile::asData 0.07;
 use Text::vCard::Node;
 
 # See this module for your basic parser functions
 use base qw(Text::vFile::asData);
-use vars qw ($VERSION %lookup %node_aliases @simple);
-$VERSION = '2.11';
+use vars qw (%lookup %node_aliases @simple);
 
 # If the node's data does not break down use this
 my @default_field = qw(value);
@@ -81,31 +83,31 @@ map { push( @simple, lc($_) ) } @simple;
 
 =head1 NAME
 
-Text::vCard - a package to edit and create a single vCard (RFC 2426) 
+Text::vCard - a package to edit and create a single vCard (RFC 2426)
 
 =head1 WARNING
 
 To handle a whole addressbook with several vCard entries in it, you probably
 want to start with L<Text::vCard::Addressbook>, then this module.
 
-This is not backwards compatable with 1.0 or earlier versions! 
+This is not backwards compatable with 1.0 or earlier versions!
 
 Version 1.1 was a complete rewrite/restructure, this should not happen again.
 
 =head1 SYNOPSIS
 
   use Text::vCard;
-  my $cards = Text::vCard->new({
-	'asData_node' => $objects_node_from_asData,
-  });
+  my $cards
+      = Text::vCard->new( { 'asData_node' => $objects_node_from_asData, } );
 
 =head1 DESCRIPTION
 
 A vCard is an electronic business card. 
 
-This package is for a single vCard (person / record / set of address information).
-It provides an API to editing and creating vCards, or supplied a specific piece
-of the Text::vFile::asData results it generates a vCard with that content.
+This package is for a single vCard (person / record / set of address
+information). It provides an API to editing and creating vCards, or supplied
+a specific piece of the Text::vFile::asData results it generates a vCard 
+with that content.
 
 You should really use L<Text::vCard::Addressbook> as this handles creating
 vCards from an existing file for you.
@@ -117,11 +119,10 @@ vCards from an existing file for you.
   use Text::vCard;
 
   my $new_vcard = Text::vCard->new();
-  
-  my $existing_vcard = Text::vCard->new({
-	'asData_node' => $objects_node_from_asData,
-  });
-  
+
+  my $existing_vcard
+      = Text::vCard->new( { 'asData_node' => $objects_node_from_asData, } );
+
 =cut
 
 sub new {
@@ -162,9 +163,7 @@ sub new {
 
 =head2 add_node()
 
-my $address = $vcard->add_node({
-	'node_type' => 'ADR',
-});
+  my $address = $vcard->add_node( { 'node_type' => 'ADR', } );
 
 This creates a new address (a L<Text::vCard::Node> object) in the vCard
 which you can then call the address methods on. See below for what options are available.
@@ -194,20 +193,24 @@ The following method allows you to extract the contents from the vCard.
   $nodes = $vcard->get('tel');
 
   # Just get the home address
-  my $nodes = $vcard->get({
-	'node_type' => 'addresses',
-	'types' => 'home',
-  });
-  
+  my $nodes = $vcard->get(
+      {   'node_type' => 'addresses',
+          'types'     => 'home',
+      }
+  );
+
   # get all phone number that matches serveral types
   my @types = qw(work home);
-  my $nodes = $vcard->get({
-	'node_type' => 'tel',
-	'types' => \@types,
-  });
- 
-Either an array or array ref is returned, containing L<Text::vCard::Node> objects.
-If there are no results of 'node_type' undef is returned.
+  my $nodes = $vcard->get(
+      {   'node_type' => 'tel',
+          'types'     => \@types,
+      }
+  );
+
+
+Either an array or array ref is returned, containing
+L<Text::vCard::Node> objects.  If there are no results of 'node_type'
+undef is returned.
 
 Supplied with a scalar or an array ref the methods
 return a list of nodes of a type, where relevant. If any
@@ -232,7 +235,7 @@ sub get {
 
 The following method is a convenience wrapper for accessing simple elements.
 
-  $value = $vcard->get_simple_type('email', ['internet', 'work']);
+  $value = $vcard->get_simple_type( 'email', [ 'internet', 'work' ] );
 
 If multiple elements match, then only the first is returned.  If the object
 isn't found, or doesn't have a simple value, then undef is returned.
@@ -246,9 +249,9 @@ sub get_simple_type {
     my ( $self, $node_type, $types ) = @_;
     carp "You did not supply an element type" unless defined $node_type;
 
-    my %hash = ('node_type', $node_type);
+    my %hash = ( 'node_type', $node_type );
     $hash{'types'} = $types if defined $types;
-    my $node = $self->get(\%hash);
+    my $node = $self->get( \%hash );
     return undef unless $node && @{$node} > 0 && exists $node->[0]->{'value'};
 
     $node->[0]->{'value'};
@@ -256,10 +259,10 @@ sub get_simple_type {
 
 =head2 nodes
 
-  my $addresses = $vcard->get({ 'node_type' => 'address' });
+  my $addresses = $vcard->get( { 'node_type' => 'address' } );
 
   my $first_address = $addresses->[0];
-  
+
   # get the value
   print $first_address->street();
 
@@ -267,12 +270,13 @@ sub get_simple_type {
   $first_address->street('Barney Rubble');
 
   # See if it is part of a group
-  if($first_address->group()) {
-	print 'Group: ' . $first_address->group();
+  if ( $first_address->group() ) {
+      print 'Group: ' . $first_address->group();
   }
-  
-According to the RFC the following 'simple' nodes should only have one element, this is
-not enforced by this module, so for example you can have multiple URL's if you wish.
+
+According to the RFC the following 'simple' nodes should only have one
+element, this is not enforced by this module, so for example you can
+have multiple URL's if you wish.
 
 =head2 simple nodes
 
@@ -282,9 +286,10 @@ For simple nodes, you can also access the first node in the following way:
   # or setting
   $vcard->fullname('new name');
 
-The node will be automatically created if it does not exist and you supplied a value.
-undef is returned if the node does not exist. Simple nodes can be called as all upper
-or all lowercase method names.
+The node will be automatically created if it does not exist and you
+supplied a value.  undef is returned if the node does not
+exist. Simple nodes can be called as all upper or all lowercase method
+names.
 
   vCard Spec: 'simple'    Alias
   --------------------    --------
@@ -318,9 +323,9 @@ or all lowercase method names.
   LABELS
   ORG                           'name','unit' (unit is a special case and will return an array reference)
 
-  my $addresses = $vcard->get({ 'node_type' => 'addresses' });
-  foreach my $address (@{$addresses}) {
-	print $address->street();
+  my $addresses = $vcard->get( { 'node_type' => 'addresses' } );
+  foreach my $address ( @{$addresses} ) {
+      print $address->street();
   }
 
   # Setting values on an address element
@@ -335,10 +340,10 @@ or all lowercase method names.
 =head2 get_group()
 
   my $group_name = 'item1';
-  my $node_type = 'X-ABLABEL';
-  my $of_group = $vcard->get_group($group_name,$node_type);
-  foreach my $label (@{$of_group}) {
-	print $label->value();
+  my $node_type  = 'X-ABLABEL';
+  my $of_group   = $vcard->get_group( $group_name, $node_type );
+  foreach my $label ( @{$of_group} ) {
+      print $label->value();
   }
 
 This method takes one or two arguments. The group name
@@ -359,7 +364,7 @@ sub get_group {
 
     carp "No group name supplied"
         unless defined $group_name
-            and $group_name ne '';
+        and $group_name ne '';
 
     $group_name = lc($group_name);
 
@@ -390,8 +395,9 @@ sub get_group {
 
 =head1 BINARY METHODS
 
-These methods allow access to what are potentially
-binary values such as a photo or sound file.
+These methods allow access to what are potentially binary values such
+as a photo or sound file. Binary values will be correctly encoded and
+decoded to/from base 64.
 
 API still to be finalised.
 
@@ -410,14 +416,15 @@ sub DESTROY {
 
 =head2 get_lookup
 
-This method is used internally to lookup those nodes which have multiple elements,
-e.g. GEO has lat and long, N (name) has family, given, middle etc.
+This method is used internally to lookup those nodes which have
+multiple elements, e.g. GEO has lat and long, N (name) has family,
+given, middle etc.
 
-If you wish to extend this package (for custom attributes), overload this method
-in your code
+If you wish to extend this package (for custom attributes), overload
+this method in your code:
 
   sub my_lookup {
-		return \%my_lookup;
+      return \%my_lookup;
   }
   *Text::vCard::get_lookup = \&my_lookup;
 
@@ -432,7 +439,7 @@ sub get_lookup {
 
 =head2 get_of_type()
 
-  my $list = $vcard->get_of_type($node_type,\@types);
+  my $list = $vcard->get_of_type( $node_type, \@types );
 
 It is probably easier just to use the get() method, which inturn calls
 this method.
@@ -458,12 +465,8 @@ sub get_of_type {
         my @of_type;
         if ( ref($types) eq 'ARRAY' ) {
             @of_type = @{$types};
-
-            #	print "T A: " . join('-',@{$types}) . "\n";
         } else {
             push( @of_type, $types );
-
-            #	print "T: $types\n";
         }
         my @to_return;
         foreach my $element ( @{ $self->{nodes}->{$node_type} } ) {
@@ -475,7 +478,6 @@ sub get_of_type {
             }
             if ( $check == 1 ) {
 
-                #	print "Adding: $element->street() \n";
                 push( @to_return, $element );
             }
         }
@@ -494,6 +496,35 @@ sub get_of_type {
             ? @{ $self->{nodes}->{$node_type} }
             : $self->{nodes}->{$node_type};
     }
+}
+
+=head2 as_string
+
+Returns the vCard as a string.
+
+=cut
+
+sub as_string {
+    my ( $self, $fields, $charset ) = @_;
+
+    # derp
+    my %e = map { lc $_ => 1 } @{ $fields || [] };
+
+    my @k = qw(VERSION N FN);
+    if ($fields) {
+        push @k, map { uc $_ } @$fields;
+    } else {
+        push @k, grep { defined $_ and $_ ne '' and $_ !~ /^(VERSION|N|FN)$/ }
+            map { uc $_ } keys %{ $self->{nodes} };
+    }
+
+    my @lines = qw(BEGIN:VCARD);
+    for my $k (@k) {
+        next unless $k;
+        next unless my $nodes = $self->get($k);
+        push @lines, map { $_->as_string($charset) } @{$nodes};
+    }
+    return join "\x0d\x0a", @lines, 'END:VCARD', '';
 }
 
 sub _sort_prefs {

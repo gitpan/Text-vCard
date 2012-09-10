@@ -1,7 +1,12 @@
 Changes
+INSTALL
+LICENSE
 MANIFEST
-TODO
+MANIFEST.SKIP
+META.json
+META.yml
 Makefile.PL
+README
 lib/Text/vCard.pm
 lib/Text/vCard/Addressbook.pm
 lib/Text/vCard/Node.pm
@@ -12,13 +17,15 @@ t/04-formats.t
 t/05-export.t
 t/06-encoding.t
 t/07-quoted.t
-t/simple.vcf
-t/encoding.vcf
-t/mix_type.vcf
-t/evolution.vcf
+t/08-base64.t
 t/apple_2.1_unicode.vcf
 t/apple_version3.vcf
+t/base64.vcf
+t/encoding.vcf
+t/evolution.vcf
+t/mix_type.vcf
 t/notes.vcf
 t/quoted.vcf
-META.yml                                Module meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)
+t/release-no-tabs.t
+t/release-pod-syntax.t
+t/simple.vcf
