@@ -1,6 +1,6 @@
 package Text::vCard::Addressbook;
 {
-  $Text::vCard::Addressbook::VERSION = '2.12';
+  $Text::vCard::Addressbook::VERSION = '2.13';
 }
 
 use Carp;
@@ -239,6 +239,7 @@ sub export {
         push @lines, 'END:VCARD';
     }
     my $vcf_file = join( "\r\n", @lines );
+    $vcf_file .= "\r\n" if $vcf_file;
     return $vcf_file;
 }
 

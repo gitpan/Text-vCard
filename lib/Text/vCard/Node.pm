@@ -1,6 +1,6 @@
 package Text::vCard::Node;
 {
-  $Text::vCard::Node::VERSION = '2.12';
+  $Text::vCard::Node::VERSION = '2.13';
 }
 
 use strict;
@@ -222,7 +222,7 @@ sub types {
     my $self = shift;
     my @types;
     return undef unless defined $self->{params};
-    @types = keys %{ $self->{params} };
+    @types = sort keys %{ $self->{params} };
     return wantarray ? @types : \@types;
 }
 

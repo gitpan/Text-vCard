@@ -30,4 +30,4 @@ requires:
 resources:
   bugtracker: https://github.com/ranguard/text-vcard/issues
   repository: https://github.com/ranguard/text-vcard
-version: 2.12
+version: 2.13
