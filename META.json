@@ -1,10 +1,11 @@
 {
    "abstract" : "a package to edit and create a single vCard (RFC 2426)",
    "author" : [
-      "Leo Lapworth"
+      "Leo Lapworth",
+      "Eric Johnson (kablamo)"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300018, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.132830",
    "license" : [
       "perl_5"
    ],
@@ -19,6 +20,13 @@
             "ExtUtils::MakeMaker" : "6.30"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
@@ -26,7 +34,12 @@
             "File::Slurp" : "9999.04",
             "MIME::Base64" : "3.07",
             "MIME::QuotedPrint" : "3.07",
+            "Moo" : "0",
+            "Path::Class" : "0",
+            "Text::Wrap" : "0",
             "Text::vFile::asData" : "0.07",
+            "URI" : "0",
+            "Unicode::LineBreak" : "0",
             "base" : "0",
             "perl" : "5.006",
             "strict" : "0",
@@ -37,8 +50,10 @@
       "test" : {
          "requires" : {
             "Data::Dumper" : "0",
-            "Digest" : "0",
-            "Test::More" : "0"
+            "Directory::Scratch" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "lib" : "0"
          }
       }
    },
@@ -53,6 +68,6 @@
          "web" : "https://github.com/ranguard/text-vcard"
       }
    },
-   "version" : "2.13"
+   "version" : "3.00"
 }
 

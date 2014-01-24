@@ -1,8 +1,5 @@
 package Text::vCard;
-{
-  $Text::vCard::VERSION = '2.13';
-}
-
+$Text::vCard::VERSION = '3.00';
 use 5.006;
 use Carp;
 use strict;
@@ -41,7 +38,7 @@ my @default_field = qw(value);
 
 # Generate all our simple methods
 @simple
-    = qw(FN BDAY MAILER TZ TITLE ROLE NOTE PRODID REV SORT-STRING UID URL CLASS FULLNAME BIRTHDAY TZ NAME EMAIL NICKNAME PHOTO);
+    = qw(FN BDAY MAILER TZ TITLE ROLE NOTE PRODID REV SORT-STRING UID URL CLASS FULLNAME BIRTHDAY TIMEZONE NAME EMAIL NICKNAME PHOTO);
 
 # Now we want lowercase as well
 map { push( @simple, lc($_) ) } @simple;
@@ -87,8 +84,8 @@ Text::vCard - a package to edit and create a single vCard (RFC 2426)
 
 =head1 WARNING
 
-To handle a whole addressbook with several vCard entries in it, you probably
-want to start with L<Text::vCard::Addressbook>, then this module.
+L<vCard> and L<vCard::AddressBook> are built on top of this module and provide
+a more intuitive user interface.  Please try those modules first.
 
 =head1 SYNOPSIS
 
@@ -127,6 +124,8 @@ sub new {
     my $self = {};
 
     bless( $self, $class );
+
+    $self->{encoding_out} = $conf->{encoding_out} || 'UTF-8';
 
     my %nodes;
     $self->{nodes} = \%nodes;
@@ -501,26 +500,29 @@ Returns the vCard as a string.
 =cut
 
 sub as_string {
-    my ( $self, $fields, $charset ) = @_;
+    my ( $self, $fields ) = @_;
 
     # derp
     my %e = map { lc $_ => 1 } @{ $fields || [] };
 
     my @k = qw(VERSION N FN);
     if ($fields) {
-        push @k, map { uc $_ } @$fields;
+        push @k, sort map { uc $_ } @$fields;
     } else {
-        push @k, grep { defined $_ and $_ ne '' and $_ !~ /^(VERSION|N|FN)$/ }
-            map { uc $_ } keys %{ $self->{nodes} };
+        push @k, grep { $_ !~ /^(VERSION|N|FN)$/ }
+            sort map { uc $_ } keys %{ $self->{nodes} };
     }
 
-    my @lines = qw(BEGIN:VCARD);
+    my $begin   = 'BEGIN:VCARD';
+    my $end     = 'END:VCARD';
+    my $newline = "\r\n";
+
+    my @lines = ($begin);
     for my $k (@k) {
-        next unless $k;
-        next unless my $nodes = $self->get($k);
-        push @lines, map { $_->as_string($charset) } @{$nodes};
+        my $nodes = $self->get($k);
+        push @lines, map { $_->as_string() } @$nodes;
     }
-    return join "\x0d\x0a", @lines, 'END:VCARD', '';
+    return join $newline, @lines, $end, '';
 }
 
 sub _sort_prefs {
@@ -562,10 +564,11 @@ sub _add_node {
     my $last_node;
     foreach my $node_data ( @{ $conf->{data} } ) {
         my $node_obj = Text::vCard::Node->new(
-            {   node_type => $node_type,
-                fields    => $field_list,
-                data      => $node_data,
-                group     => $conf->{group} || '',
+            {   node_type    => $node_type,
+                fields       => $field_list,
+                data         => $node_data,
+                group        => $conf->{group} || '',
+                encoding_out => $self->{encoding_out},
             }
         );
 
@@ -580,10 +583,7 @@ sub _add_node {
 =head1 AUTHOR
 
 Leo Lapworth, LLAP@cuckoo.org
-
-=head1 BUGS
-
-None that I'm aware of - export may not encode correctly.
+Eric Johnson (kablamo), github ~!at!~ iijo dot org
 
 =head1 Repository (git)
 
@@ -597,7 +597,8 @@ it and/or modify it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Text::vCard::Addressbook>, L<Text::vCard::Node>
+L<Text::vCard::Addressbook>, L<Text::vCard::Node>,
+L<vCard> L<vCard>, L<vCard::AddressBook> L<vCard::AddressBook>,
 
 =cut
 
