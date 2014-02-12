@@ -1,5 +1,5 @@
 package vCard::AddressBook;
-$vCard::AddressBook::VERSION = '3.00';
+$vCard::AddressBook::VERSION = '3.01';
 use Moo;
 use vCard;
 use Path::Class;
