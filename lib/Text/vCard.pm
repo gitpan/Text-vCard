@@ -1,10 +1,9 @@
 package Text::vCard;
-$Text::vCard::VERSION = '3.01';
+$Text::vCard::VERSION = '3.02';
 use 5.006;
 use Carp;
 use strict;
 use warnings;
-use File::Slurp 9999.04;
 use Text::vFile::asData 0.07;
 use Text::vCard::Node;
 

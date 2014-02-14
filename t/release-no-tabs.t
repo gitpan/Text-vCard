@@ -19,7 +19,8 @@ my @files = (
     'lib/Text/vCard/Addressbook.pm',
     'lib/Text/vCard/Node.pm',
     'lib/vCard.pm',
-    'lib/vCard/AddressBook.pm'
+    'lib/vCard/AddressBook.pm',
+    'lib/vCard/Role/FileIO.pm'
 );
 
 notabs_ok($_) foreach @files;

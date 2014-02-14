@@ -13,6 +13,7 @@ lib/Text/vCard/Addressbook.pm
 lib/Text/vCard/Node.pm
 lib/vCard.pm
 lib/vCard/AddressBook.pm
+lib/vCard/Role/FileIO.pm
 t/01-node.t
 t/02-vcard.t
 t/03-addressbook.t

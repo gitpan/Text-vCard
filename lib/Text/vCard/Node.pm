@@ -1,5 +1,5 @@
 package Text::vCard::Node;
-$Text::vCard::Node::VERSION = '3.01';
+$Text::vCard::Node::VERSION = '3.02';
 use strict;
 use warnings;
 use Carp;
