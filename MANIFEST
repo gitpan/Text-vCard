@@ -37,7 +37,6 @@ t/mix_type.vcf
 t/notes.vcf
 t/quoted.vcf
 t/quotedprintable.vcf
-t/release-no-tabs.t
 t/release-pod-syntax.t
 t/simple.vcf
 t/types.t

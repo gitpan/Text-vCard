@@ -1,5 +1,5 @@
 package vCard;
-$vCard::VERSION = '3.02';
+$vCard::VERSION = '3.03';
 use Moo;
 
 use Path::Tiny;
@@ -121,14 +121,16 @@ Returns $self in case you feel like chaining.
 
 sub load_file {
     my ( $self, $filename ) = @_;
-    return vCard::AddressBook    #
-        ->new(
-        {   encoding_in  => $self->encoding_in,
-            encoding_out => $self->encoding_out,
-        }
-        )                         #
-        ->load_file($filename)    #
-        ->vcards->[0];
+
+    my $addressBook = vCard::AddressBook->new({
+        encoding_in  => $self->encoding_in,
+        encoding_out => $self->encoding_out,
+    });
+    my $vcard = $addressBook->load_file($filename)->vcards->[0];
+
+    $self->_data($vcard->_data);
+
+    return $self;
 }
 
 =head2 load_string($string)
@@ -140,13 +142,16 @@ decoded (but not MIME decoded).
 
 sub load_string {
     my ( $self, $string ) = @_;
-    return vCard::AddressBook    #
-        ->new(
-        {   encoding_in  => $self->encoding_in,
-            encoding_out => $self->encoding_out,
-        }
-        )->load_string($string)    #
-        ->vcards->[0];
+
+    my $addressBook = vCard::AddressBook->new({
+        encoding_in  => $self->encoding_in,
+        encoding_out => $self->encoding_out,
+    });
+    my $vcard = $addressBook->load_string($string)->vcards->[0];
+
+    $self->_data($vcard->_data);
+
+    return $self;
 }
 
 =head2 as_string()

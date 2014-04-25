@@ -1,5 +1,5 @@
 package Text::vCard::Addressbook;
-$Text::vCard::Addressbook::VERSION = '3.02';
+$Text::vCard::Addressbook::VERSION = '3.03';
 use Carp;
 use strict;
 use warnings;

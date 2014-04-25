@@ -1,5 +1,5 @@
 package vCard::Role::FileIO;
-$vCard::Role::FileIO::VERSION = '3.02';
+$vCard::Role::FileIO::VERSION = '3.03';
 use Moo::Role;
 use Path::Tiny;
 
