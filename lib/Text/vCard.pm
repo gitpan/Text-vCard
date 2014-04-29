@@ -1,5 +1,5 @@
 package Text::vCard;
-$Text::vCard::VERSION = '3.03';
+$Text::vCard::VERSION = '3.04';
 use 5.006;
 use Carp;
 use strict;

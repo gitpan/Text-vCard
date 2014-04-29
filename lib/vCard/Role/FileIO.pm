@@ -1,5 +1,5 @@
 package vCard::Role::FileIO;
-$vCard::Role::FileIO::VERSION = '3.03';
+$vCard::Role::FileIO::VERSION = '3.04';
 use Moo::Role;
 use Path::Tiny;
 
@@ -13,13 +13,13 @@ requires qw/encoding_in encoding_out/;
 sub _iomode_out {
     my ($self) = @_;
     return {} if $self->encoding_out eq 'none';
-    return { binmode => ':encoding(' . $self->encoding_out . ')' };
+    return { binmode => ':raw:encoding(' . $self->encoding_out . ')' };
 }
 
 sub _iomode_in {
     my ($self) = @_;
     return {} if $self->encoding_in eq 'none';
-    return { binmode => ':encoding(' . $self->encoding_in . ')' };
+    return { binmode => ':raw:encoding(' . $self->encoding_in . ')' };
 }
 
 # Filename can be a string, a Path::Tiny obj, or a Path::Class obj.
