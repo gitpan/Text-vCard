@@ -1,5 +1,5 @@
 package vCard;
-$vCard::VERSION = '3.04';
+$vCard::VERSION = '3.05';
 use Moo;
 
 use Path::Tiny;
