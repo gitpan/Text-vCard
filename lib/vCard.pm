@@ -1,5 +1,5 @@
 package vCard;
-$vCard::VERSION = '3.05';
+$vCard::VERSION = '3.06';
 use Moo;
 
 use Path::Tiny;
@@ -9,7 +9,7 @@ use URI;
 
 =head1 NAME
 
-vCard - read, write, and edit a single vCard
+vCard - Read, write, and edit vCards
 
 =head1 SYNOPSIS
 

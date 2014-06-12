@@ -1,5 +1,5 @@
 package Text::vCard::Node;
-$Text::vCard::Node::VERSION = '3.05';
+$Text::vCard::Node::VERSION = '3.06';
 use strict;
 use warnings;
 use Carp;
@@ -331,9 +331,9 @@ sub add_types {
         $self->{params} = \%params;
     }
     if ( ref($type) eq 'ARRAY' ) {
-        map { $self->{params}->{ lc($_) } = 1 } @{$type};
+        map { $self->{params}->{ lc($_) } = 'type' } @{$type};
     } else {
-        $self->{params}->{ lc($type) } = 1;
+        $self->{params}->{ lc($type) } = 'type';
     }
 }
 

@@ -10,7 +10,7 @@ use ExtUtils::MakeMaker 6.30;
 
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "a package to edit and create a single vCard (RFC 2426)",
+  "ABSTRACT" => "Edit and create vCards (RFC 2426)",
   "AUTHOR" => "Leo Lapworth, Eric Johnson (kablamo)",
   "BUILD_REQUIRES" => {},
   "CONFIGURE_REQUIRES" => {
@@ -44,9 +44,9 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "lib" => 0
   },
-  "VERSION" => "3.05",
+  "VERSION" => "3.06",
   "test" => {
-    "TESTS" => "t/*.t t/vcard/*.t"
+    "TESTS" => "t/*.t t/text/vcard/node/*.t t/vcard/*.t"
   }
 );
 

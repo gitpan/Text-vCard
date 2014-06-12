@@ -1,5 +1,5 @@
 ---
-abstract: 'a package to edit and create a single vCard (RFC 2426)'
+abstract: 'Edit and create vCards (RFC 2426)'
 author:
   - 'Leo Lapworth'
   - 'Eric Johnson (kablamo)'
@@ -38,4 +38,4 @@ requires:
 resources:
   bugtracker: https://github.com/ranguard/text-vcard/issues
   repository: https://github.com/ranguard/text-vcard
-version: '3.05'
+version: '3.06'

@@ -1,5 +1,5 @@
 package Text::vCard::Addressbook;
-$Text::vCard::Addressbook::VERSION = '3.05';
+$Text::vCard::Addressbook::VERSION = '3.06';
 use Carp;
 use strict;
 use warnings;
@@ -12,7 +12,7 @@ use base qw(Text::vFile::asData);
 
 =head1 NAME
 
-Text::vCard::Addressbook - a package to parse, edit and create multiple vCards (RFC 2426) 
+Text::vCard::Addressbook - Parse, edit, and create vCard address books (RFC 2426) 
 
 =head1 WARNING
 

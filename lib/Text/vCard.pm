@@ -1,5 +1,5 @@
 package Text::vCard;
-$Text::vCard::VERSION = '3.05';
+$Text::vCard::VERSION = '3.06';
 use 5.006;
 use Carp;
 use strict;
@@ -79,7 +79,7 @@ map { push( @simple, lc($_) ) } @simple;
 
 =head1 NAME
 
-Text::vCard - a package to edit and create a single vCard (RFC 2426)
+Text::vCard - Edit and create vCards (RFC 2426)
 
 =head1 WARNING
 
